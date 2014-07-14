@@ -1,4 +1,4 @@
-package com.heelenyc.soar.consumer;
+package com.heelenyc.soar.consumer.nio;
 
 /**
  * @author yicheng

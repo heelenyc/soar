@@ -1,4 +1,4 @@
-package com.heelenyc.soar.provider;
+package com.heelenyc.soar.provider.nio;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
