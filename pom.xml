@@ -1,16 +1,30 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.heelenyc.soar</groupId>
-  <artifactId>soar</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <packaging>pom</packaging>
-  <name>soar name</name>
-  <description>soar desc</description>
-  <modules>
-  	<module>soar-provider</module>
-  	<module>soar-consumer</module>
-  	<module>soar-keeper</module>
-  	<module>soar-web</module>
-  	<module>soar-core</module>
-  </modules>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.heelenyc.soar</groupId>
+	<artifactId>soar</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>soar</name>
+
+	<description>a simple soa framework</description>
+
+	<modules>
+		<module>soar-provider</module>
+		<module>soar-consumer</module>
+		<module>soar-keeper</module>
+		<module>soar-web</module>
+		<module>soar-core</module>
+	</modules>
+
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.heelenyc.soar</groupId>
+				<artifactId>soar-core</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>
