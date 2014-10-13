@@ -12,7 +12,6 @@
 	<modules>
 		<module>soar-provider</module>
 		<module>soar-consumer</module>
-		<module>soar-keeper</module>
 		<module>soar-web</module>
 		<module>soar-core</module>
 	</modules>

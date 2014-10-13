@@ -7,15 +7,15 @@ package com.heelenyc.soar.core.service.entity;
  */
 public final class ProviderMetaData {
 
-    private String IP;
+    private String ip;
     private int port;
     private int weight;
     
     public String getIP() {
-        return IP;
+        return ip;
     }
     public void setIP(String iP) {
-        IP = iP;
+        ip = iP;
     }
     public int getPort() {
         return port;
