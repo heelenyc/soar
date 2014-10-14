@@ -5,7 +5,7 @@ package com.heelenyc.soar.core.service.entity;
  * @since 2014年10月11日
  *
  */
-public final class ProviderMetaData {
+public final class ProviderMetaData extends ServiceMetaData {
 
     private String ip;
     private int port;
@@ -28,5 +28,11 @@ public final class ProviderMetaData {
     }
     public void setWeight(int weight) {
         this.weight = weight;
+    }
+    /**
+     * @return
+     */
+    public String getTargetURI() {
+        return String.format("%s@%s:%s", getServiceURI(),getIP(),getPort());
     }
 }

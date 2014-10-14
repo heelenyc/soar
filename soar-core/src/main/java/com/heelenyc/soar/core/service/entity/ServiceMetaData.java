@@ -10,14 +10,23 @@ package com.heelenyc.soar.core.service.entity;
  */
 public abstract class ServiceMetaData {
 
-    private String serviStringURI;
-    
-    public String getServiStringURI() {
-        return serviStringURI;
+    private String serviceURI;
+    private Class<?> serviceInterface;
+
+    public String getServiceURI() {
+        return serviceURI;
     }
 
-    public void setServiStringURI(String serviStringURI) {
-        this.serviStringURI = serviStringURI;
+    public void setServiceURI(String serviceURI) {
+        this.serviceURI = serviceURI;
+    }
+
+    public Class<?> getServiceInterface() {
+        return serviceInterface;
+    }
+
+    public void setServiceInterface(Class<?> serviceInterface) {
+        this.serviceInterface = serviceInterface;
     }
     
 }

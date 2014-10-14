@@ -2,7 +2,7 @@ package com.heelenyc.soar.core.api.route;
 
 import java.util.List;
 
-import com.heelenyc.soar.core.service.entity.ConsumerMetaData;
+import com.heelenyc.soar.core.service.entity.ConsumerServiceMetaData;
 import com.heelenyc.soar.core.service.entity.ProviderMetaData;
 
 /**
@@ -14,5 +14,5 @@ public interface RouteService {
 
     List<ProviderMetaData> getProviderList(String serviceUri);
 
-    ProviderMetaData getTargetProvider(String serviceUri,ConsumerMetaData consumerMetaData) throws Throwable;
+    ProviderMetaData getTargetProvider(String serviceUri,ConsumerServiceMetaData consumerMetaData) throws Throwable;
 }
