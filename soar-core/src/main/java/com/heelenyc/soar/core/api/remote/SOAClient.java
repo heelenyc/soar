@@ -1,6 +1,7 @@
 package com.heelenyc.soar.core.api.remote;
 
 import java.lang.reflect.Method;
+import java.net.URI;
 
 /**
  * @author yicheng
@@ -9,6 +10,7 @@ import java.lang.reflect.Method;
  */
 public interface SOAClient {
 
+    URI getTargetURI();
     /**
      * @param serviceURI
      * @param method

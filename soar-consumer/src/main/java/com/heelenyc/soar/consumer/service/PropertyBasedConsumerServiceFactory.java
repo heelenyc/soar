@@ -1,12 +1,15 @@
 package com.heelenyc.soar.consumer.service;
 
-import java.io.IOException;
-import java.util.Properties;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.heelenyc.soar.core.api.Constants;
+import com.heelenyc.soar.core.common.utils.NetUtil;
+import com.heelenyc.soar.core.common.utils.PropertiesUtil;
 import com.heelenyc.soar.core.exception.InitializationException;
+import com.heelenyc.soar.core.service.entity.ConsumerServiceMetaData;
 
 /**
  * @author yicheng
@@ -16,15 +19,35 @@ import com.heelenyc.soar.core.exception.InitializationException;
 public class PropertyBasedConsumerServiceFactory extends ConsumerServiceFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(PropertyBasedConsumerServiceFactory.class);
-    private Properties props;
 
+    @SuppressWarnings("rawtypes")
     public PropertyBasedConsumerServiceFactory(String propertyFile) throws InitializationException {
-        props = new Properties();
-        try {
-            props.load(Thread.currentThread().getContextClassLoader().getResourceAsStream(propertyFile));
-        } catch (IOException e) {
-            logger.error("ioexcetion for " + propertyFile, e);
+        PropertiesUtil props = new PropertiesUtil(propertyFile);
+        
+        //遍历每个服务的配置，写入上下文
+        Map<String, Object> serviceConfigs = props.getPropsByPrefix(Constants.CONFIG_SERVICE_PREFIX);
+        for(String serviceURI : serviceConfigs.keySet()){
+            try {
+                Map serviceConfig = (Map)serviceConfigs.get(serviceURI);
+                // 接口名称
+                String interfaceName = serviceConfig.get(Constants.CONFIG_INTERFACE).toString();
+                ConsumerServiceMetaData consumerServiceMetaData = new ConsumerServiceMetaData(serviceURI,interfaceName);
+                
+                // timeout
+                consumerServiceMetaData.setTimeout(Constants.DEFAULT_TIMEOUT_INMS);
+                
+                // 本机ip
+                consumerServiceMetaData.setIp(NetUtil.getLocalIPAddress());
+                
+                // 在
+                registerService(consumerServiceMetaData);
+                
+            } catch (Exception e) {
+                logger.error(e.getMessage(),e);
+                throw new InitializationException(serviceURI);
+            }
         }
         
+
     }
 }

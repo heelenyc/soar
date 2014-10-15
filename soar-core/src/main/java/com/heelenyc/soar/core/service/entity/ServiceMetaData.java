@@ -11,6 +11,7 @@ package com.heelenyc.soar.core.service.entity;
 public abstract class ServiceMetaData {
 
     private String serviceURI;
+    private String interfaceName;
     private Class<?> serviceInterface;
 
     public String getServiceURI() {
@@ -27,6 +28,14 @@ public abstract class ServiceMetaData {
 
     public void setServiceInterface(Class<?> serviceInterface) {
         this.serviceInterface = serviceInterface;
+    }
+
+    public String getInterfaceName() {
+        return interfaceName;
+    }
+
+    public void setInterfaceName(String interfaceName) {
+        this.interfaceName = interfaceName;
     }
     
 }

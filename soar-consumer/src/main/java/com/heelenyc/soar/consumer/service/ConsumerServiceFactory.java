@@ -49,4 +49,9 @@ public class ConsumerServiceFactory extends ServiceFactory {
         
         return (T)proxies.get(serviceURI);
     }
+    
+    public void registerService(ConsumerServiceMetaData consumerServiceMetaData){
+        SOAContext soaContext = CASBasedSOAContext.getInstance();
+        soaContext.put(Constants.CONSUMER_SERVICE_METADATA, consumerServiceMetaData.getServiceURI(), consumerServiceMetaData);
+    }
 }

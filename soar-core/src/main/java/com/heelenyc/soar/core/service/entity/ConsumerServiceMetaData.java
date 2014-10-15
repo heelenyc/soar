@@ -3,7 +3,7 @@ package com.heelenyc.soar.core.service.entity;
 /**
  * @author yicheng
  * @since 2014年10月13日
- *
+ * 
  */
 public class ConsumerServiceMetaData extends ServiceMetaData {
 
@@ -12,7 +12,18 @@ public class ConsumerServiceMetaData extends ServiceMetaData {
      */
     private String ip;
     private int timeout; // 超时时间
-    
+
+    /**
+     * @param serviceURI
+     * @param interfaceName
+     * @throws ClassNotFoundException 
+     */
+    public ConsumerServiceMetaData(String serviceURI, String interfaceName) throws ClassNotFoundException {
+        setServiceURI(serviceURI);
+        setInterfaceName(interfaceName);
+        setServiceInterface(Class.forName(interfaceName));
+    }
+
     public String getIp() {
         return ip;
     }
@@ -28,5 +39,5 @@ public class ConsumerServiceMetaData extends ServiceMetaData {
     public void setTimeout(int timeout) {
         this.timeout = timeout;
     }
-    
+
 }
