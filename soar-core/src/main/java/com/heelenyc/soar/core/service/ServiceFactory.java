@@ -18,7 +18,7 @@ public abstract class ServiceFactory {
 
             @Override
             public void run() {
-                logger.info("MOA ServiceFactory shutting down...");
+                logger.info("SOA ServiceFactory shutting down...");
                 shutdown();
             }
         });

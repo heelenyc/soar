@@ -23,6 +23,7 @@ public class SOAClientTcp extends AbstractSOAClient {
     public SOAClientTcp(String targetURIStr) throws InvalidTargetUriException {
         super(targetURIStr);
         
+        // 构建时启动连接
         
     }
 

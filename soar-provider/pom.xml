@@ -24,15 +24,14 @@
 			<version>3.8.1</version>
 			<scope>test</scope>
 		</dependency>
-<!-- 		<dependency>
-			<groupId>org.jboss.netty</groupId>
-			<artifactId>netty</artifactId>
-			<version>3.2.9.Final</version>
-		</dependency> -->
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-all</artifactId>
 			<version>5.0.0.Alpha1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.heelenyc.soar</groupId>
+			<artifactId>soar-core</artifactId>
 		</dependency>
 	</dependencies>
 </project>

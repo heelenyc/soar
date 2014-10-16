@@ -7,4 +7,8 @@ package com.heelenyc.soar.core.api.remote;
  */
 public interface SOAServer {
 
+    void start();
+    
+    void stop();
+    
 }
