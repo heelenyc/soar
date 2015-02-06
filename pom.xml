@@ -14,6 +14,8 @@
 		<module>soar-consumer</module>
 		<module>soar-web</module>
 		<module>soar-core</module>
+		<module>soar-server</module>
+		<module>soar-client</module>
 	</modules>
 
 
