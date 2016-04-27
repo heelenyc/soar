@@ -1,7 +1,9 @@
 package com.heelenyc.soar.provider.executor;
 
-import com.heelenyc.soar.Request;
-import com.heelenyc.soar.Response;
+import java.lang.reflect.Method;
+
+import com.heelenyc.soar.api.bean.Request;
+import com.heelenyc.soar.api.bean.Response;
 
 /**
  * @author yicheng
@@ -10,16 +12,15 @@ import com.heelenyc.soar.Response;
  */
 public class SingleThreadSoarExecutor extends AbstractSoarExecutor {
 
-    //private Logger logger = LogUtils.getLogger(SingleThreadSoarExecutor.class);
+    // private Logger logger =
+    // LogUtils.getLogger(SingleThreadSoarExecutor.class);
 
-
-    public SingleThreadSoarExecutor(Class<?> api, Object imlObject) {
-        super(api, imlObject);
+    public SingleThreadSoarExecutor() {
     }
 
     @Override
-    public Response executor(Request request) {
-        return super.executor(request);
+    public Response executor(Request request, Method method, Object imlObject) {
+        return super.executor(request, method, imlObject);
     }
 
 }

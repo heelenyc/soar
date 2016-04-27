@@ -1,4 +1,4 @@
-package heelenyc.soar.server;
+package heelenyc.soar.server.demo.impl;
 
 import heelenyc.soar.server.demo.api.IDemoInterface;
 
@@ -9,13 +9,14 @@ import com.heelenyc.soar.provider.SoarProvider;
  * @since 2016年4月27日
  * 
  */
-public class ServerBootstrap {
+public class DemoServerBootstrap {
 
     /**
      * @param args
      */
     public static void main(String[] args) {
-        SoarProvider provider = new SoarProvider("/test", "127.0.0.1:18188", IDemoInterface.class.getName(), new DemoImplement());
+        SoarProvider provider = new SoarProvider("127.0.0.1:18188");
+        provider.registUri("/test", IDemoInterface.class.getName(), new DemoImplement());
         provider.start();
     }
 

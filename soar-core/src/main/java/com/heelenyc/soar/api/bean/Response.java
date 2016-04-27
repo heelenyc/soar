@@ -1,4 +1,4 @@
-package com.heelenyc.soar;
+package com.heelenyc.soar.api.bean;
 
 /**
  * @author yicheng

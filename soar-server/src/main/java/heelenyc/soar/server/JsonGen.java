@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.heelenyc.commonlib.JsonUtils;
-import com.heelenyc.soar.Request;
+import com.heelenyc.soar.api.bean.Request;
 
 /**
  * @author yicheng

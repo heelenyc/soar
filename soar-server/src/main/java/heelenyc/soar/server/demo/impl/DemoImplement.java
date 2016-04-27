@@ -1,4 +1,4 @@
-package heelenyc.soar.server;
+package heelenyc.soar.server.demo.impl;
 
 import heelenyc.soar.server.demo.api.IDemoInterface;
 import heelenyc.soar.server.demo.api.ParamsBean;

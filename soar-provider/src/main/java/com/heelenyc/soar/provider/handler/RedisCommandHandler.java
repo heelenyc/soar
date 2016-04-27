@@ -7,9 +7,9 @@ import com.heelenyc.commonlib.JsonUtils;
 import com.heelenyc.simpleredis.api.reply.RedisReply;
 import com.heelenyc.simpleredis.handler.AbstractRedisCommandHandler;
 import com.heelenyc.simpleredis.reply.SimpleStringReply;
-import com.heelenyc.soar.Request;
-import com.heelenyc.soar.Response;
-import com.heelenyc.soar.Response.ResponseCode;
+import com.heelenyc.soar.api.bean.Request;
+import com.heelenyc.soar.api.bean.Response;
+import com.heelenyc.soar.api.bean.Response.ResponseCode;
 import com.heelenyc.soar.provider.SoarProvider;
 import com.heelenyc.soar.provider.executor.IExecutor;
 
@@ -27,8 +27,8 @@ public class RedisCommandHandler extends AbstractRedisCommandHandler {
     /**
      * @param soarProvider
      */
-    public RedisCommandHandler(IExecutor<Request> executor,SoarProvider provider) {
-        this.executor = executor;
+    public RedisCommandHandler(SoarProvider provider) {
+        this.executor = provider.getExecutor();
         this.parentProvider = provider;
     }
 
@@ -40,12 +40,12 @@ public class RedisCommandHandler extends AbstractRedisCommandHandler {
             
             logger.info("received Request : " + req.toString());
             
-            if (!parentProvider.getTargetUri().equals(req.getServiceURI())) {
+            if (!parentProvider.hasUri(req.getServiceURI())) {
                 resp = new Response();
                 resp.setEc(ResponseCode.INVALID_URI.getValue());
                 resp.setEm("invalid uri");
             }else {
-                resp = executor.executor(req);
+                resp = executor.executor(req,parentProvider.getMethod(req.getMethod()),parentProvider.getImpObj(req.getServiceURI()));
             }
             
         } catch (Exception e) {

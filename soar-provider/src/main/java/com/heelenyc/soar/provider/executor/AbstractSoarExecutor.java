@@ -8,15 +8,14 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 
 import com.heelenyc.commonlib.ClassUtils;
 import com.heelenyc.commonlib.LogUtils;
-import com.heelenyc.soar.Request;
-import com.heelenyc.soar.Response;
-import com.heelenyc.soar.Response.ResponseCode;
+import com.heelenyc.soar.api.bean.Request;
+import com.heelenyc.soar.api.bean.Response;
+import com.heelenyc.soar.api.bean.Response.ResponseCode;
 
 /**
  * @author yicheng
@@ -27,37 +26,23 @@ public abstract class AbstractSoarExecutor implements IExecutor<Request> {
 
     private Logger logger = LogUtils.getLogger(AbstractSoarExecutor.class);
 
-//    private Object imlObject;
-//    private Map<String, Method> methods = new ConcurrentHashMap<String, Method>();
-//    private Map<String, Class<?>[]> types = new ConcurrentHashMap<String, Class<?>[]>();
-
-    public AbstractSoarExecutor() {
-//        this.imlObject = imlObject;
-//        for (Method m : api.getMethods()) {
-//            if (methods.containsKey(m.getName())) {
-//                throw new RuntimeException("not support over-load ! (more than one methods have the same name in " + api.getName() + ")");
-//            }
-//            methods.put(m.getName(), m);
-//            types.put(m.getName(), m.getParameterTypes());
-//        }
-    }
+//    public AbstractSoarExecutor() {
+//    }
 
     @Override
-    public Response executor(Request request,Method method) {
-        String methodStr = request.getMethod();
-        // Method method = methods.get(methodStr);
+    public Response executor(Request request, Method method, Object imlObject) {
         Object data = null;
         Response resp = new Response();
         try {
             // 参数匹配的问题, 主要是pojo类参数
             List<Object> params = new ArrayList<Object>();
             Object[] rawParams = request.getParams().toArray();
-            Class<?>[] paramsTypes = types.get(methodStr);
+            Class<?>[] paramsTypes = method.getParameterTypes();
 
             //logger.info("rawParams: " + JsonUtils.toJSON(rawParams));
             //logger.info("paramsTypes: " + JsonUtils.toJSON(paramsTypes));
             
-            if (paramsTypes == null || rawParams == null) {
+            if (rawParams == null) {
                 throw new IllegalArgumentException();
             }
             
