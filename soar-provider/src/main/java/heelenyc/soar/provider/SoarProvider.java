@@ -1,4 +1,10 @@
-package com.heelenyc.soar.provider;
+package heelenyc.soar.provider;
+
+import heelenyc.soar.core.api.bean.Request;
+import heelenyc.soar.core.keeper.SoarKeeperManager;
+import heelenyc.soar.provider.executor.IExecutor;
+import heelenyc.soar.provider.executor.SingleThreadSoarExecutor;
+import heelenyc.soar.provider.handler.RedisCommandHandler;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -9,10 +15,6 @@ import org.apache.log4j.Logger;
 
 import com.heelenyc.commonlib.LogUtils;
 import com.heelenyc.simpleredis.server.AbstractRedisServer;
-import com.heelenyc.soar.api.bean.Request;
-import com.heelenyc.soar.provider.executor.IExecutor;
-import com.heelenyc.soar.provider.executor.SingleThreadSoarExecutor;
-import com.heelenyc.soar.provider.handler.RedisCommandHandler;
 
 /**
  * 一个provider对应一个端口，但是可以对应多个service-uri，就是说多个uri可以共享一个端口，通常是一个服务家族
@@ -62,6 +64,7 @@ public class SoarProvider {
             }
             
             // 向中心报告
+            // SoarKeeperManager.
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             System.exit(0);

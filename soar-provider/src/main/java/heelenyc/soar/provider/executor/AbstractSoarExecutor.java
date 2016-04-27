@@ -1,4 +1,8 @@
-package com.heelenyc.soar.provider.executor;
+package heelenyc.soar.provider.executor;
+
+import heelenyc.soar.core.api.bean.Request;
+import heelenyc.soar.core.api.bean.Response;
+import heelenyc.soar.core.api.bean.Response.ResponseCode;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
@@ -13,9 +17,6 @@ import org.apache.log4j.Logger;
 
 import com.heelenyc.commonlib.ClassUtils;
 import com.heelenyc.commonlib.LogUtils;
-import com.heelenyc.soar.api.bean.Request;
-import com.heelenyc.soar.api.bean.Response;
-import com.heelenyc.soar.api.bean.Response.ResponseCode;
 
 /**
  * @author yicheng

@@ -1,9 +1,9 @@
-package com.heelenyc.soar.provider.executor;
+package heelenyc.soar.provider.executor;
+
+import heelenyc.soar.core.api.bean.Request;
+import heelenyc.soar.core.api.bean.Response;
 
 import java.lang.reflect.Method;
-
-import com.heelenyc.soar.api.bean.Request;
-import com.heelenyc.soar.api.bean.Response;
 
 /**
  * @author yicheng
