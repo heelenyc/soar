@@ -8,4 +8,12 @@
   <artifactId>soar-server</artifactId>
   <name>soar-server</name>
   <description>transport server module</description>
+  <dependencies>
+
+  <dependency>
+  	<groupId>com.heelenyc.soar</groupId>
+  	<artifactId>soar-provider</artifactId>
+  	<version>1.0.0-SNAPSHOT</version>
+  </dependency>
+  </dependencies>
 </project>

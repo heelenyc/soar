@@ -7,7 +7,7 @@
 	<packaging>pom</packaging>
 	<name>soar</name>
 
-	<description>a simple soa framework</description>
+	<description>a simple micro-service framework</description>
 
 	<modules>
 		<module>soar-provider</module>

@@ -27,11 +27,17 @@
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-all</artifactId>
-			<version>5.0.0.Alpha1</version>
+			<version>4.0.25.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>com.heelenyc.soar</groupId>
 			<artifactId>soar-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.heelenyc.simpleredis</groupId>
+			<artifactId>simpleredis</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>
