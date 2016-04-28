@@ -1,5 +1,6 @@
 package heelenyc.soar.provider;
 
+import heelenyc.commonlib.LogUtils;
 import heelenyc.soar.core.api.bean.Request;
 import heelenyc.soar.core.keeper.SoarKeeperManager;
 import heelenyc.soar.provider.executor.IExecutor;
@@ -13,8 +14,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.apache.log4j.Logger;
 
-import com.heelenyc.commonlib.LogUtils;
-import com.heelenyc.simpleredis.server.AbstractRedisServer;
+import com.heelenyc.simpleredis.server.SimpleRedisServer;
 
 /**
  * 一个provider对应一个端口，但是可以对应多个service-uri，就是说多个uri可以共享一个端口，通常是一个服务家族
@@ -26,7 +26,7 @@ import com.heelenyc.simpleredis.server.AbstractRedisServer;
 public class SoarProvider {
 
     private Logger logger = LogUtils.getLogger(SoarProvider.class);
-    private AbstractRedisServer server;// = new AbstractRedisServer(new
+    private SimpleRedisServer server;// = new AbstractRedisServer(new
                                        // RedisCommandHandler(this));
     private Map<String, Object> uri2Impobj;
     private Map<String, Method> methods;
@@ -53,8 +53,6 @@ public class SoarProvider {
 
     public boolean registUri(String targetUri, String apiClassName, Object serviceImp) {
         try {
-            apiClassNameList.add(apiClassName);
-            uri2Impobj.put(targetUri, serviceImp);
             Class<?> api = Class.forName(apiClassName);
             for (Method m : api.getMethods()) {
                 if (methods.containsKey(m.getName())) {
@@ -62,9 +60,11 @@ public class SoarProvider {
                 }
                 methods.put(m.getName(), m);
             }
+            uri2Impobj.put(targetUri, serviceImp);
+            apiClassNameList.add(apiClassName);
             
             // 向中心报告
-            // SoarKeeperManager.
+            SoarKeeperManager.publisService(targetUri,getLocalHostport());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             System.exit(0);
@@ -76,7 +76,7 @@ public class SoarProvider {
         try {
 
             RedisCommandHandler handler = new RedisCommandHandler(this);
-            server = new AbstractRedisServer(handler);
+            server = new SimpleRedisServer(handler);
             server.start(localHostport);
 
         } catch (Exception e) {
