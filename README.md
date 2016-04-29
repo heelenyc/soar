@@ -1,4 +1,4 @@
 soar
 ====
 
-a simple soa framework based on 
+a simple soa framework based on redis protocl
