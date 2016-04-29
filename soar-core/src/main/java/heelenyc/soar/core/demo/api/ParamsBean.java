@@ -1,4 +1,4 @@
-package heelenyc.soar.server.demo.api;
+package heelenyc.soar.core.demo.api;
 
 /**
  * @author yicheng

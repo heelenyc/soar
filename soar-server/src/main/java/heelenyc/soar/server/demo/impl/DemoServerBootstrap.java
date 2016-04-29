@@ -1,7 +1,7 @@
 package heelenyc.soar.server.demo.impl;
 
+import heelenyc.soar.core.demo.api.IDemoInterface;
 import heelenyc.soar.provider.SoarProvider;
-import heelenyc.soar.server.demo.api.IDemoInterface;
 
 /**
  * @author yicheng

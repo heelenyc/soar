@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * @author yicheng
  * @since 2016年3月18日
- *
+ * 
  */
 public class Request {
 
@@ -13,9 +13,9 @@ public class Request {
     private String serviceURI;
     private String method;
     private List<Object> params;
-    
+
     // additinal info
-    private String source;  // source host
+    private String source; // source host
 
     public String getServiceURI() {
         return serviceURI;
@@ -32,7 +32,6 @@ public class Request {
     public void setSource(String source) {
         this.source = source;
     }
-
 
     public String getMethod() {
         return method;
@@ -54,5 +53,9 @@ public class Request {
     public String toString() {
         return "Request [serviceURI=" + serviceURI + ", method=" + method + ", params=" + params + ", source=" + source + "]";
     }
-    
+
+    public Integer hashKey() {
+        return (getServiceURI() +"@"+ getSource()).hashCode();
+    }
+
 }

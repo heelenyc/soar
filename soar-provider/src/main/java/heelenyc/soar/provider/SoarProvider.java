@@ -65,6 +65,7 @@ public class SoarProvider {
             
             // 向中心报告
             SoarKeeperManager.publisService(targetUri,getLocalHostport());
+            
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             System.exit(0);

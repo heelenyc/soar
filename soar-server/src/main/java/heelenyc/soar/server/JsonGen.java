@@ -2,7 +2,7 @@ package heelenyc.soar.server;
 
 import heelenyc.commonlib.JsonUtils;
 import heelenyc.soar.core.api.bean.Request;
-import heelenyc.soar.server.demo.api.ParamsBean;
+import heelenyc.soar.core.demo.api.ParamsBean;
 
 import java.util.ArrayList;
 import java.util.List;

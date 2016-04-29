@@ -1,6 +1,7 @@
 package heelenyc.soar.provider.executor;
 
 import heelenyc.commonlib.ClassUtils;
+import heelenyc.commonlib.JsonUtils;
 import heelenyc.commonlib.LogUtils;
 import heelenyc.soar.core.api.bean.Request;
 import heelenyc.soar.core.api.bean.Response;
@@ -34,6 +35,9 @@ public abstract class AbstractSoarExecutor implements IExecutor<Request> {
         Object data = null;
         Response resp = new Response();
         try {
+            if (method == null) {
+                throw new IllegalArgumentException("cannot find method");
+            }
             // 参数匹配的问题, 主要是pojo类参数
             List<Object> params = new ArrayList<Object>();
             Object[] rawParams = request.getParams().toArray();
@@ -52,6 +56,7 @@ public abstract class AbstractSoarExecutor implements IExecutor<Request> {
             
             for (int i = 0; i < paramsTypes.length; i++) {
                 if (!ClassUtils.isCommonPrimitive(paramsTypes[i])) {
+                    // TODO 有可能是 数组 map list set pojo等
                     logger.info("type " + paramsTypes[i].getName() + " is not isPrimitive!");
                     
                     BeanInfo beanInfo = Introspector.getBeanInfo(paramsTypes[i]);  
@@ -78,8 +83,15 @@ public abstract class AbstractSoarExecutor implements IExecutor<Request> {
             }
 
             data = method.invoke(imlObject, params.toArray());
-
-            resp.setData(data);
+            // data可能是任何类型数据，但是json协议出去之后，只能在客户端反序列化，根据情况而定
+            // 作为java端  data需要反序列化
+            Class<?> returnType = method.getReturnType();
+            if (!ClassUtils.isCommonPrimitive(returnType)) {
+                LogUtils.info(logger, "returnType for {0} is not isCommonPrimitive", request);
+                resp.setData(JsonUtils.toJSON(data));
+            } else {
+                resp.setData(data);
+            }
             resp.setEc(ResponseCode.OK.getValue());
             resp.setEm("OK");
         } catch (IllegalArgumentException e) {

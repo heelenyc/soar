@@ -1,5 +1,6 @@
 package heelenyc.soar.core.keeper;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -22,8 +23,7 @@ public class SoarKeeperManager {
      * @return
      */
     public static List<String> getServiceAddress(String uri) {
-        // TODO Auto-generated method stub
-        return null;
+        return Arrays.asList("127.0.0.1:18188");
     }
 
 }
