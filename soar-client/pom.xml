@@ -9,10 +9,10 @@
   <name>soar-client</name>
   <description>transport client module</description>
   <dependencies>
-  	<dependency>
+<!--   	<dependency>
   		<groupId>com.heelenyc.soar</groupId>
   		<artifactId>soar-core</artifactId>
-  	</dependency>
+  	</dependency> -->
   	<dependency>
   		<groupId>com.heelenyc.commonlib</groupId>
   		<artifactId>commonlib</artifactId>

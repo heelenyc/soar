@@ -1,6 +1,5 @@
 package heelenyc.soar.core.api.bean;
 
-import java.util.List;
 
 /**
  * @author yicheng
@@ -12,8 +11,12 @@ public class Request {
     // for to call
     private String serviceURI;
     private String method;
-    private List<Object> params;
+    private Object params;
+    private int protocol; // java 和 非 java 的
 
+//    public Request(int protocol){
+//        setProtocol(protocol);
+//    }
     // additinal info
     private String source; // source host
 
@@ -41,14 +44,6 @@ public class Request {
         this.method = method;
     }
 
-    public List<Object> getParams() {
-        return params;
-    }
-
-    public void setParams(List<Object> params) {
-        this.params = params;
-    }
-
     @Override
     public String toString() {
         return "Request [serviceURI=" + serviceURI + ", method=" + method + ", params=" + params + ", source=" + source + "]";
@@ -57,5 +52,22 @@ public class Request {
     public Integer hashKey() {
         return (getServiceURI() +"@"+ getSource()).hashCode();
     }
+
+    public int getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(int protocol) {
+        this.protocol = protocol;
+    }
+
+    public Object getParams() {
+        return params;
+    }
+
+    public void setParams(Object params) {
+        this.params = params;
+    }
+
 
 }

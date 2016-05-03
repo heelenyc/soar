@@ -21,6 +21,7 @@ public class ServiceProxy {
     public static Object newInstance(IConsumer consumer) throws ClassNotFoundException {
         Class<?> api = Class.forName(consumer.getApi());
         return Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), new Class<?>[] { api }, new ProxyHandler(consumer));
+        //return Proxy.newProxyInstance(api.getClassLoader(), new Class<?>[] { api }, new ProxyHandler(consumer));
     }
 
     private static class ProxyHandler implements InvocationHandler {

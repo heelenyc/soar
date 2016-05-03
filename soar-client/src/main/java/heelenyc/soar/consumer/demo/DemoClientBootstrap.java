@@ -21,11 +21,14 @@ public class DemoClientBootstrap {
         SoarConsumer consumer = new SoarConsumer("/test", "mod", IDemoInterface.class.getName());
         
         IDemoInterface service = consumer.getInstance();
-        ParamsBean bean = new ParamsBean();
-        bean.setOp1(2.1d);
-        bean.setOp2(3.1d);
+//        ParamsBean bean = new ParamsBean();
+//        bean.setOp1(2.1d);
+//        bean.setOp2(3.1d);
+//        
+//        Double ret = service.addList(Arrays.asList(bean,bean));
         
-        Double ret = service.addList(Arrays.asList(bean,bean));
+        Double ret = service.addDouble(1.1d,2.1d);
+        
         
         System.out.println(ret);
         

@@ -1,19 +1,21 @@
 package heelenyc.soar.consumer;
 
-import heelenyc.commonlib.ClassUtils;
 import heelenyc.commonlib.IpUtils;
 import heelenyc.commonlib.JedisPoolUtils;
 import heelenyc.commonlib.JsonUtils;
 import heelenyc.commonlib.LogUtils;
+import heelenyc.commonlib.StringUtils;
 import heelenyc.commonlib.hash.IHashLocator;
 import heelenyc.commonlib.hash.KetamaHashLocator;
 import heelenyc.commonlib.hash.ModLocator;
 import heelenyc.soar.consumer.api.IConsumer;
 import heelenyc.soar.consumer.proxy.ServiceProxy;
+import heelenyc.soar.core.api.bean.ProtocolToken;
 import heelenyc.soar.core.api.bean.Request;
 import heelenyc.soar.core.api.bean.Response;
 import heelenyc.soar.core.keeper.SoarKeeperManager;
 import heelenyc.soar.core.keeper.listner.AbstractServiceListner;
+import heelenyc.soar.core.serialize.SerializeUtils;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -150,38 +152,39 @@ public class SoarConsumer implements IConsumer {
     @Override
     public Object callMethod(Method method, Object[] args) {
 
-        Request req = new Request();
-        req.setMethod(method.getName());
-        if (args == null) {
-            req.setParams(Arrays.asList());
-        }else {
-            req.setParams(Arrays.asList(args));
+        Jedis redisDao = null;
+        String hashKey = null;
+        try {
+            Request req = new Request();
+            // 客户端是java
+            req.setProtocol(ProtocolToken.JAVA);
+            req.setMethod(method.getName());
+            if (args == null) {
+                req.setParams(SerializeUtils.serialize(new Object[] {}));
+            } else {
+                req.setParams(SerializeUtils.serialize(args));
+            }
+            req.setServiceURI(getUri());
+            req.setSource(IpUtils.IP_LAN);
+
+            hashKey = req.hashKey().toString();
+            redisDao = getRedisService(hashKey);
+            String reqStr = JsonUtils.toJSON(req);
+            String ret = redisDao.get(reqStr);
+
+            Response response = JsonUtils.toT(ret, Response.class);
+
+            // 作为java端 data需要反序列化
+            return SerializeUtils.deserialize((byte[]) response.getData());
+
+        } catch (Exception e) {
+            LogUtils.error(logger, e, e.getMessage());
+            throw new RuntimeException(StringUtils.format("callMethod error for {0} {1}", method, Arrays.asList(args)));
+        } finally {
+            if (redisDao != null) {
+                returnRedisService(hashKey, redisDao);
+            }
         }
-        req.setServiceURI(getUri());
-        req.setSource(IpUtils.IP_LAN);
-
-        Jedis redisDao = getRedisService(req.hashKey().toString());
-        String ret = redisDao.get(JsonUtils.toJSON(req));
-        returnRedisService(req.hashKey().toString(), redisDao);
-
-        Response response = JsonUtils.toT(ret, Response.class);
-
-//        // 作为java端  data需要反序列化
-//        Class<?> returnType = method.getReturnType();
-//        if (!ClassUtils.isCommonPrimitive(returnType)) {
-//            // 考虑 数组 list set map  共四种
-//            String dataStr = response.getData().toString();
-//            LogUtils.info(logger, "returnType for {0} is not isCommonPrimitive", req);
-//            if (List.class.isAssignableFrom(returnType)) {
-//                // 获取 List<E> 的元素
-//                Class<?> retType = returnType.getMethod("get", null).getReturnType();
-//                return JsonUtils.toTList(dataStr, returnType.g);
-//            }
-//            return JsonUtils.toT(dataStr, returnType);
-//        } else {
-//            // 基础类型直接返回，由invoke强转
-            return response.getData();
-//        }
     }
 
     private Jedis getRedisService(String key) {

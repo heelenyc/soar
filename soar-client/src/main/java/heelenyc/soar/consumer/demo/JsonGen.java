@@ -32,9 +32,9 @@ public class JsonGen {
 //
 //        System.out.println(JsonUtils.toJSON(request));
         
-        ParamsBean bean = new ParamsBean();
-        bean.setOp1(2.1d);
-        bean.setOp2(3.1d);
+//        ParamsBean bean = new ParamsBean();
+//        bean.setOp1(2.1d);
+//        bean.setOp2(3.1d);
         
         //System.out.println(JsonUtils.toJSON(bean));
 //        List<ParamsBean> list = Arrays.asList(bean,bean);
@@ -58,8 +58,10 @@ public class JsonGen {
 //        
 //        System.out.println(JsonUtils.toT(listStr, List.class));
 //        System.out.println(JsonUtils.toTList(listStr, ParamsBean.class));
-        List<String> list = new ArrayList<String>();
-        System.out.println(list.getClass().getName());
-        System.out.println(list.getClass().getMethod("get",new Class<?>[]{int.class}).getReturnType());
+//        List<String> list = new ArrayList<String>();
+//        System.out.println(list.getClass().getName());
+//        System.out.println(list.getClass().getMethod("get",new Class<?>[]{int.class}).getReturnType());
+        
+//        System.out.println(JsonUtils.toT(JsonUtils.toJSON(new Byte[]{1,23}),Byte[].class));
     }
 }

@@ -9,6 +9,7 @@ public class Response {
     
     private int ec;
     private String em;
+    private int protocol; // java 和 非 java 的
     
     private Object data;
 
@@ -56,6 +57,14 @@ public class Response {
         public int getValue(){
             return this.code;
         }
+    }
+
+    public int getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(int protocol) {
+        this.protocol = protocol;
     }
     
     
