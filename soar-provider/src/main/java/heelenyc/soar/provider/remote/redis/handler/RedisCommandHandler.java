@@ -1,4 +1,4 @@
-package heelenyc.soar.provider.handler;
+package heelenyc.soar.provider.remote.redis.handler;
 
 import heelenyc.commonlib.JsonUtils;
 import heelenyc.soar.core.api.bean.Request;
@@ -6,13 +6,11 @@ import heelenyc.soar.core.api.bean.Response;
 import heelenyc.soar.core.api.bean.Response.ResponseCode;
 import heelenyc.soar.provider.SoarProvider;
 import heelenyc.soar.provider.executor.IExecutor;
+import heelenyc.soar.provider.remote.redis.api.RedisReply;
+import heelenyc.soar.provider.remote.redis.reply.SimpleStringReply;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.heelenyc.simpleredis.api.reply.RedisReply;
-import com.heelenyc.simpleredis.handler.AbstractRedisCommandHandler;
-import com.heelenyc.simpleredis.reply.SimpleStringReply;
 
 /**
  * @author yicheng

@@ -65,7 +65,7 @@ public class SoarConsumer implements IConsumer {
                 // throw new
                 // RuntimeException("cannot get any instance for service");
             } else {
-                LogUtils.warn(logger, "cannot get instance for service uri {0} : {1}", uri, serviceAddressList);
+                LogUtils.warn(logger, "get instance for service uri {0} : {1}", uri, serviceAddressList);
             }
             this.consumUri = uri;
 
@@ -168,8 +168,8 @@ public class SoarConsumer implements IConsumer {
             req.setSource(IpUtils.IP_LAN);
 
             hashKey = req.hashKey().toString();
-            redisDao = getRedisService(hashKey);
             String reqStr = JsonUtils.toJSON(req);
+            redisDao = getRedisService(hashKey);
             String ret = redisDao.get(reqStr);
 
             Response response = JsonUtils.toT(ret, Response.class);

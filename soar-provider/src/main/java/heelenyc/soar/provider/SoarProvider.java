@@ -5,7 +5,7 @@ import heelenyc.soar.core.api.bean.Request;
 import heelenyc.soar.core.keeper.SoarKeeperManager;
 import heelenyc.soar.provider.executor.IExecutor;
 import heelenyc.soar.provider.executor.SingleThreadSoarExecutor;
-import heelenyc.soar.provider.handler.RedisCommandHandler;
+import heelenyc.soar.provider.remote.redis.handler.RedisCommandHandler;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -26,20 +26,22 @@ import com.heelenyc.simpleredis.server.SimpleRedisServer;
 public class SoarProvider {
 
     private Logger logger = LogUtils.getLogger(SoarProvider.class);
-    private SimpleRedisServer server;// = new AbstractRedisServer(new
+    private SimpleRedisServer redisServer;// = new AbstractRedisServer(new
                                        // RedisCommandHandler(this));
     private Map<String, Object> uri2Impobj;
     private Map<String, Method> methods;
-    private String localHostport;
+    private String localHost;
+    private int port;
     private ConcurrentSkipListSet<String> apiClassNameList;
     private IExecutor<Request> executor;
 
     /**
      * @param redisHandler
      */
-    public SoarProvider(String localHostPort) {
+    public SoarProvider(String localHost , int port) {
         try {
-            this.localHostport = localHostPort;
+            this.localHost = localHost ;
+            this.port = port;
             executor = new SingleThreadSoarExecutor();
             apiClassNameList = new ConcurrentSkipListSet<String>();
             uri2Impobj = new ConcurrentHashMap<String, Object>();
@@ -77,8 +79,8 @@ public class SoarProvider {
         try {
 
             RedisCommandHandler handler = new RedisCommandHandler(this);
-            server = new SimpleRedisServer(handler);
-            server.start(localHostport);
+            redisServer = new SimpleRedisServer(handler);
+            redisServer.start(localHost + ":" + (port+1));
 
         } catch (Exception e) {
             LogUtils.error(logger, e, "SoarProvider start error !");
@@ -89,11 +91,11 @@ public class SoarProvider {
 
 
     public String getLocalHostport() {
-        return localHostport;
+        return localHost;
     }
 
     public void setLocalHostport(String localHostport) {
-        this.localHostport = localHostport;
+        this.localHost = localHostport;
     }
 
 
@@ -123,6 +125,14 @@ public class SoarProvider {
      */
     public boolean hasUri(String serviceURI) {
         return uri2Impobj.containsKey(serviceURI);
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 
 }
