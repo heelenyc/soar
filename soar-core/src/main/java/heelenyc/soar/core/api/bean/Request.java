@@ -1,12 +1,21 @@
 package heelenyc.soar.core.api.bean;
 
+import java.io.Serializable;
+
 
 /**
  * @author yicheng
  * @since 2016年3月18日
  * 
  */
-public class Request {
+public class Request implements Serializable{
+    
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    private Long id = System.nanoTime();
 
     // for to call
     private String serviceURI;
@@ -14,9 +23,6 @@ public class Request {
     private Object params;
     private int protocol; // java 和 非 java 的
 
-//    public Request(int protocol){
-//        setProtocol(protocol);
-//    }
     // additinal info
     private String source; // source host
 
@@ -44,11 +50,6 @@ public class Request {
         this.method = method;
     }
 
-    @Override
-    public String toString() {
-        return "Request [serviceURI=" + serviceURI + ", method=" + method + ", params=" + params + ", source=" + source + "]";
-    }
-
     public Integer hashKey() {
         return (getServiceURI() +"@"+ getSource()).hashCode();
     }
@@ -67,6 +68,15 @@ public class Request {
 
     public void setParams(Object params) {
         this.params = params;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public String toString() {
+        return "Request [id=" + id + ", serviceURI=" + serviceURI + ", method=" + method + ", params=" + params + ", protocol=" + protocol + ", source=" + source + "]";
     }
 
 

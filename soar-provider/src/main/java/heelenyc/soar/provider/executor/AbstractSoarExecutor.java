@@ -7,7 +7,6 @@ import heelenyc.soar.core.api.bean.ProtocolToken;
 import heelenyc.soar.core.api.bean.Request;
 import heelenyc.soar.core.api.bean.Response;
 import heelenyc.soar.core.api.bean.Response.ResponseCode;
-import heelenyc.soar.core.serialize.SerializeUtils;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
@@ -40,6 +39,7 @@ public abstract class AbstractSoarExecutor implements IExecutor<Request> {
         Object data = null;
         Response resp = new Response();
         resp.setProtocol(request.getProtocol());
+        resp.setId(request.getId());
         try {
             if (method == null) {
                 throw new IllegalArgumentException("cannot find method");
@@ -48,7 +48,7 @@ public abstract class AbstractSoarExecutor implements IExecutor<Request> {
             List<Object> params = new ArrayList<Object>();
             Object[] rawParams = null;
             if (request.getProtocol() == ProtocolToken.JAVA) {
-                rawParams = (Object[]) SerializeUtils.deserialize((byte[]) request.getParams());
+                rawParams = (Object[]) request.getParams();
             } else {
                 // 非java端的请求 直接当成list
                 rawParams = ((List<Object>) request.getParams()).toArray();
@@ -114,11 +114,14 @@ public abstract class AbstractSoarExecutor implements IExecutor<Request> {
                 }
             }
 
+            // 调用真正的服务
             data = method.invoke(imlObject, params.toArray());
             // data可能是任何类型数据，但是json协议出去之后，只能在客户端反序列化，根据情况而定
             // 作为java端 data需要反序列化
+            
+            
             if (request.getProtocol() == ProtocolToken.JAVA) {
-                resp.setData(SerializeUtils.serialize(data));
+                resp.setData(data);
             }else{
                 Class<?> returnType = method.getReturnType();
                 if (!ClassUtils.isCommonPrimitive(returnType)) {
@@ -130,6 +133,8 @@ public abstract class AbstractSoarExecutor implements IExecutor<Request> {
             }
             resp.setEc(ResponseCode.OK.getValue());
             resp.setEm("OK");
+        
+        
         } catch (IllegalArgumentException e) {
             resp.setData(null);
             resp.setEc(ResponseCode.INVALID_PARAMS.getValue());

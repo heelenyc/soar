@@ -9,7 +9,10 @@ public class ProtocolToken {
     
     
 
-    public static int JAVA = 0;
-    public static int NON_JAVA = 1;
+    public static final int JAVA = 1;
+    public static final int REDIS = 2;
    
+    public static final int HEADER_LENGTH = 8;
+    
+    public static final int TIME_OUT = 3000;
 }

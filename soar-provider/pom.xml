@@ -25,11 +25,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-all</artifactId>
-			<version>4.0.25.Final</version>
-		</dependency>
-		<dependency>
 			<groupId>com.heelenyc.soar</groupId>
 			<artifactId>soar-core</artifactId>
 		</dependency>

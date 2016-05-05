@@ -5,7 +5,10 @@ import heelenyc.soar.core.api.bean.Request;
 import heelenyc.soar.core.keeper.SoarKeeperManager;
 import heelenyc.soar.provider.executor.IExecutor;
 import heelenyc.soar.provider.executor.SingleThreadSoarExecutor;
+import heelenyc.soar.provider.remote.redis.SimpleRedisServer;
 import heelenyc.soar.provider.remote.redis.handler.RedisCommandHandler;
+import heelenyc.soar.provider.remote.tcp.SimpleTcpServer;
+import heelenyc.soar.provider.remote.tcp.handler.TcpCommandHandler;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -13,8 +16,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.apache.log4j.Logger;
-
-import com.heelenyc.simpleredis.server.SimpleRedisServer;
 
 /**
  * 一个provider对应一个端口，但是可以对应多个service-uri，就是说多个uri可以共享一个端口，通常是一个服务家族
@@ -26,8 +27,8 @@ import com.heelenyc.simpleredis.server.SimpleRedisServer;
 public class SoarProvider {
 
     private Logger logger = LogUtils.getLogger(SoarProvider.class);
-    private SimpleRedisServer redisServer;// = new AbstractRedisServer(new
-                                       // RedisCommandHandler(this));
+    private SimpleRedisServer redisServer;
+    private SimpleTcpServer tcpServer;
     private Map<String, Object> uri2Impobj;
     private Map<String, Method> methods;
     private String localHost;
@@ -38,9 +39,9 @@ public class SoarProvider {
     /**
      * @param redisHandler
      */
-    public SoarProvider(String localHost , int port) {
+    public SoarProvider(String localHost, int port) {
         try {
-            this.localHost = localHost ;
+            this.localHost = localHost;
             this.port = port;
             executor = new SingleThreadSoarExecutor();
             apiClassNameList = new ConcurrentSkipListSet<String>();
@@ -64,10 +65,10 @@ public class SoarProvider {
             }
             uri2Impobj.put(targetUri, serviceImp);
             apiClassNameList.add(apiClassName);
-            
+
             // 向中心报告
-            SoarKeeperManager.publisService(targetUri,getLocalHostport());
-            
+            SoarKeeperManager.publisService(targetUri, getLocalHostport());
+
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             System.exit(0);
@@ -77,18 +78,20 @@ public class SoarProvider {
 
     public void start() {
         try {
+            TcpCommandHandler tcpHandler = new TcpCommandHandler(this);
+            tcpServer = new SimpleTcpServer(tcpHandler);
+            tcpServer.start(localHost + ":" + port);
 
             RedisCommandHandler handler = new RedisCommandHandler(this);
             redisServer = new SimpleRedisServer(handler);
-            redisServer.start(localHost + ":" + (port+1));
+            redisServer.start(localHost + ":" + (port + 1));
 
         } catch (Exception e) {
             LogUtils.error(logger, e, "SoarProvider start error !");
-            throw new RuntimeException("SoarProvider start error !", e);
+            // throw new RuntimeException("SoarProvider start error !", e);
+            System.exit(1);
         }
     }
-
-
 
     public String getLocalHostport() {
         return localHost;
@@ -97,7 +100,6 @@ public class SoarProvider {
     public void setLocalHostport(String localHostport) {
         this.localHost = localHostport;
     }
-
 
     public IExecutor<Request> getExecutor() {
         return executor;

@@ -1,6 +1,7 @@
 package heelenyc.soar.core.api.bean;
 
 import heelenyc.commonlib.HexUtils;
+import io.netty.buffer.ByteBuf;
 
 
 /**
@@ -32,6 +33,7 @@ public abstract class TcpBytePacket {
     public byte[] getBody() {
         return body;
     }
+    
 
     public void setBody(byte[] body) {
         this.body = body;
@@ -39,7 +41,11 @@ public abstract class TcpBytePacket {
 
     @Override
     public String toString() {
-//        return "MsgBytePacket [header=" + Arrays.toString(header) + ", body=" + Arrays.toString(body) + "]";
-        return "ResponseBytePacket [header=" + HexUtils.printHexString(header) + ", body=" + HexUtils.printHexString(body) + "]";
+        return "TcpBytePacket [header=" + HexUtils.printHexString(header) + ", body=" + HexUtils.printHexString(body) + "]";
+    }
+    
+    public void write(ByteBuf buf) {
+        buf.writeBytes(header);
+        buf.writeBytes(body);
     }
 }

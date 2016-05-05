@@ -27,11 +27,11 @@ import org.slf4j.LoggerFactory;
  */
 @ChannelHandler.Sharable
 public abstract class AbstractRedisCommandHandler extends SimpleChannelInboundHandler<RedisCommand> {
+    
+    public static final AttributeKey<ClientInfo> CLIENT_INFO_KEY = Constants.CLIENT_INFO_KEY;
+    public static final AttributeKey<String> CLIENT_ADDR_KEY = Constants.CLIENT_ADDR_KEY;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
-
-    public static final AttributeKey<ClientInfo> CLIENT_INFO_KEY = AttributeKey.valueOf(Constants.CLIENTINFO_CHL_ATTR);
-    public static final AttributeKey<String> CLIENT_ADDR_KEY = AttributeKey.valueOf(Constants.CLIENTADDR_CHL_ATTR);
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {

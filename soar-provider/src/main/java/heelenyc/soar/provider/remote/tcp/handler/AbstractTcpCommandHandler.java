@@ -28,8 +28,8 @@ public abstract class AbstractTcpCommandHandler extends SimpleChannelInboundHand
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public static final AttributeKey<ClientInfo> CLIENT_INFO_KEY = AttributeKey.valueOf(Constants.CLIENTINFO_CHL_ATTR);
-    public static final AttributeKey<String> CLIENT_ADDR_KEY = AttributeKey.valueOf(Constants.CLIENTADDR_CHL_ATTR);
+    public static final AttributeKey<ClientInfo> CLIENT_INFO_KEY = Constants.CLIENT_INFO_KEY;
+    public static final AttributeKey<String> CLIENT_ADDR_KEY = Constants.CLIENT_ADDR_KEY;
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -72,7 +72,7 @@ public abstract class AbstractTcpCommandHandler extends SimpleChannelInboundHand
         ClientInfo clientinfo = ctx.channel().attr(CLIENT_INFO_KEY).get();
         ResponseBytePacket respbyteBytePacket = null;
         try {
-            Request request = (Request) SerializeUtils.deserialize(requestBytePacket.getBody());
+            Request request = requestBytePacket.getBodyAsRequest();
             respbyteBytePacket = handler(request);
 
             // 更新会话信息
@@ -83,18 +83,22 @@ public abstract class AbstractTcpCommandHandler extends SimpleChannelInboundHand
             }
 
         } catch (Exception e) {
-            // reply = ErrorReply.SERVER_ERROR_REPLY;
-            throw e;
+            logger.error(e.getMessage(), e);
         } finally {
-            ctx.writeAndFlush(respbyteBytePacket);
+            if (respbyteBytePacket != null) {
+                ctx.writeAndFlush(respbyteBytePacket);
+            }else {
+                ctx.writeAndFlush(ResponseBytePacket.emptyReponsePacket);
+            }
         }
     }
 
     /**
      * @param request
      * @return
+     * @throws Exception 
      */
-    protected abstract ResponseBytePacket handler(Request request);
+    protected abstract ResponseBytePacket handler(Request request) throws Exception;
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {

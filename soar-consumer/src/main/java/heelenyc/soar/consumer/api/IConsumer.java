@@ -13,8 +13,6 @@ public interface IConsumer {
 
     String getApi();
 
-    void listenService();
-
     Object callMethod(Method method, Object[] args);
 
 }
