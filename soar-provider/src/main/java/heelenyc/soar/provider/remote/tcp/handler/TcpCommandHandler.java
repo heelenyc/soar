@@ -33,7 +33,7 @@ public class TcpCommandHandler extends AbstractTcpCommandHandler {
     protected ResponseBytePacket handler(Request req) throws Exception {
         Response resp = null;
         try {
-            // logger.info("received Request : " + req.toString());
+            logger.info("received Request : " + req.toString());
             
             if (!parentProvider.hasUri(req.getServiceURI())) {
                 resp = new Response();

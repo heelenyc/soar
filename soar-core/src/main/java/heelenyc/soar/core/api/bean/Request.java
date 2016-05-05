@@ -79,5 +79,9 @@ public class Request implements Serializable{
         return "Request [id=" + id + ", serviceURI=" + serviceURI + ", method=" + method + ", params=" + params + ", protocol=" + protocol + ", source=" + source + "]";
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
 
 }

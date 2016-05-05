@@ -14,7 +14,6 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,30 +43,49 @@ public abstract class AbstractSoarExecutor implements IExecutor<Request> {
             if (method == null) {
                 throw new IllegalArgumentException("cannot find method");
             }
-            // 参数匹配的问题, 主要是pojo类参数
-            List<Object> params = new ArrayList<Object>();
-            Object[] rawParams = null;
+
             if (request.getProtocol() == ProtocolToken.JAVA) {
-                rawParams = (Object[]) request.getParams();
+                // 调用真正的服务
+                if (request.getParams() != null) {
+                    data = method.invoke(imlObject, (Object[])request.getParams());
+                }else {
+                    data = method.invoke(imlObject);
+                }
+
+                if (request.getProtocol() == ProtocolToken.JAVA) {
+                    resp.setData(data);
+                } else {
+                    Class<?> returnType = method.getReturnType();
+                    if (!ClassUtils.isCommonPrimitive(returnType)) {
+                        LogUtils.info(logger, "returnType for {0} is not isCommonPrimitive", request);
+                        resp.setData(JsonUtils.toJSON(data));
+                    } else {
+                        resp.setData(data);
+                    }
+                }
+                resp.setEc(ResponseCode.OK.getValue());
+                resp.setEm("OK");
+                
             } else {
-                // 非java端的请求 直接当成list
-                rawParams = ((List<Object>) request.getParams()).toArray();
-            }
-            Class<?>[] paramsTypes = method.getParameterTypes();
 
-            // logger.info("rawParams: " + JsonUtils.toJSON(rawParams));
-            // logger.info("paramsTypes: " + JsonUtils.toJSON(paramsTypes));
+                // 参数匹配的问题, 主要是pojo类参数
+                List<Object> params = new ArrayList<Object>();
+                Object[] rawParams = null;
+                if (request.getParams() != null) {
+                    rawParams = ((List<Object>) request.getParams()).toArray();
+                }
+                Class<?>[] paramsTypes = method.getParameterTypes();
 
-            if (rawParams == null) {
-                throw new IllegalArgumentException();
-            }
+                // logger.info("rawParams: " + JsonUtils.toJSON(rawParams));
+                // logger.info("paramsTypes: " + JsonUtils.toJSON(paramsTypes));
 
-            if (paramsTypes.length != rawParams.length) {
-                throw new IllegalArgumentException();
-            }
-            if (request.getProtocol() == ProtocolToken.JAVA) {
-                params = Arrays.asList(rawParams);
-            } else {
+                if (method.getParameterTypes().length > 0 && (rawParams == null || rawParams.length == 0)) {
+                    throw new IllegalArgumentException();
+                } 
+
+                if (rawParams != null && paramsTypes.length != rawParams.length) {
+                    throw new IllegalArgumentException();
+                }
                 for (int i = 0; i < paramsTypes.length; i++) {
                     if (!ClassUtils.isCommonPrimitive(paramsTypes[i])) {
                         // TODO 有可能是 数组 map list set pojo等,
@@ -112,29 +130,30 @@ public abstract class AbstractSoarExecutor implements IExecutor<Request> {
                         params.add(rawParams[i]);
                     }
                 }
-            }
 
-            // 调用真正的服务
-            data = method.invoke(imlObject, params.toArray());
-            // data可能是任何类型数据，但是json协议出去之后，只能在客户端反序列化，根据情况而定
-            // 作为java端 data需要反序列化
-            
-            
-            if (request.getProtocol() == ProtocolToken.JAVA) {
-                resp.setData(data);
-            }else{
-                Class<?> returnType = method.getReturnType();
-                if (!ClassUtils.isCommonPrimitive(returnType)) {
-                    LogUtils.info(logger, "returnType for {0} is not isCommonPrimitive", request);
-                    resp.setData(JsonUtils.toJSON(data));
-                } else {
-                    resp.setData(data);
+                // 调用真正的服务
+                if (paramsTypes.length == 0) {
+                    data = method.invoke(imlObject);
+                }else {
+                    data = method.invoke(imlObject, params.toArray());
                 }
+                // data可能是任何类型数据，但是json协议出去之后，只能在客户端反序列化，根据情况而定
+                // 作为java端 data需要反序列化
+
+                if (request.getProtocol() == ProtocolToken.JAVA) {
+                    resp.setData(data);
+                } else {
+                    Class<?> returnType = method.getReturnType();
+                    if (!ClassUtils.isCommonPrimitive(returnType)) {
+                        LogUtils.info(logger, "returnType for {0} is not isCommonPrimitive", request);
+                        resp.setData(JsonUtils.toJSON(data));
+                    } else {
+                        resp.setData(data);
+                    }
+                }
+                resp.setEc(ResponseCode.OK.getValue());
+                resp.setEm("OK");
             }
-            resp.setEc(ResponseCode.OK.getValue());
-            resp.setEm("OK");
-        
-        
         } catch (IllegalArgumentException e) {
             resp.setData(null);
             resp.setEc(ResponseCode.INVALID_PARAMS.getValue());

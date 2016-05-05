@@ -11,13 +11,11 @@ import heelenyc.soar.core.api.bean.Response;
  */
 public class RemoteCallerDecorater {
 
-    private IRemoteCaller redisCaller;
     private IRemoteCaller tcpCaller;
 
     public RemoteCallerDecorater(String uri, String hashModel, String apiClassName) {
         try {
             tcpCaller = new TcpCaller(uri, hashModel, apiClassName);
-            redisCaller = new RedisCaller(uri, hashModel, apiClassName);
         } catch (Exception e) {
             throw new RuntimeException("RemoteCallerDecorater error", e);
         }
@@ -29,8 +27,6 @@ public class RemoteCallerDecorater {
         }
         if (req.getProtocol() == ProtocolToken.JAVA) {
             return tcpCaller.call(req);
-        } else if (req.getProtocol() == ProtocolToken.REDIS) {
-            return redisCaller.call(req);
         } else {
             throw new RuntimeException("RemoteCallerDecorater invalid protocol " + req.getProtocol());
         }

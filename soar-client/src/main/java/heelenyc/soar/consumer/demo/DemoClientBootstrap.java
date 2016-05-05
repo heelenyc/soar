@@ -1,9 +1,15 @@
 package heelenyc.soar.consumer.demo;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import heelenyc.soar.consumer.SoarConsumer;
+import heelenyc.soar.consumer.remote.IRemoteCaller;
+import heelenyc.soar.consumer.remote.RedisCaller;
+import heelenyc.soar.core.api.bean.ProtocolToken;
+import heelenyc.soar.core.api.bean.Request;
+import heelenyc.soar.core.api.bean.Response;
 import heelenyc.soar.core.demo.api.IDemoInterface;
 import heelenyc.soar.core.demo.api.ParamsBean;
 
@@ -19,23 +25,93 @@ public class DemoClientBootstrap {
      * @throws InterruptedException
      */
     public static void main(String[] args) {
+//        try {
+//
+//            SoarConsumer consumer = new SoarConsumer("/test", "mod", IDemoInterface.class.getName());
+//
+//            long start = System.currentTimeMillis();
+//            IDemoInterface service = consumer.getInstance();
+//            for (int i = 0; i < 3; i++) {
+//                try {
+//                    if (i % 1000 == 0) {
+//                        System.out.println("+++++++++++++++++++++++++=========>  " + i);
+//                    }
+//                        
+//                    ParamsBean bean = new ParamsBean();
+//                    bean.setOp1(Math.random() * 100);
+//                    bean.setOp2(Math.random() * 100);
+//                    
+//                    int ret = service.addInt(1, 2);
+////                    Double ret = service.addList(Arrays.asList(bean, bean));
+//                    System.out.println(ret);
+//                    
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//                // TimeUnit.SECONDS.sleep(1);
+//                // Thread.sleep(10);
+//            }
+//            long end = System.currentTimeMillis();
+//            System.out.println("cost time : " + (end - start));
+//
+//            // Double ret = service.addDouble(1.1d,2.1d);
+//
+//            // System.out.println(Arrays.asList(Class.forName(IDemoInterface.class.getName()).getInterfaces()));
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+        
         try {
 
-            SoarConsumer consumer = new SoarConsumer("/test", "mod", IDemoInterface.class.getName());
+            IRemoteCaller redisCaller = new RedisCaller("/test", "mod", IDemoInterface.class.getName());
 
             long start = System.currentTimeMillis();
-            IDemoInterface service = consumer.getInstance();
-            for (int i = 0; i < 10000; i++) {
+            for (int i = 0; i < 1; i++) {
+                Request request = null;
                 try {
+                    if (i % 1000 == 0) {
+                        System.out.println("+++++++++++++++++++++++++=========>  " + i);
+                    }
+                        
                     ParamsBean bean = new ParamsBean();
                     bean.setOp1(Math.random() * 100);
                     bean.setOp2(Math.random() * 100);
                     
-                    Double ret = service.addList(Arrays.asList(bean, bean));
-                    System.out.println(ret);
-                    if (i % 1000 == 0) {
-                        System.out.println("+++++++++++++++++++++++++=========>  " + i);
-                    }
+                    request = new Request();
+                    request.setMethod("addInt");
+                    request.setParams(Arrays.asList(1, 2));
+                    request.setProtocol(ProtocolToken.REDIS);
+                    request.setServiceURI("/test");
+                    request.setSource("127.0.0.1");
+                    System.out.println(redisCaller.call(request));
+                    
+                    request = new Request();
+                    request.setMethod("add");
+                    request.setParams(Arrays.asList(bean));
+                    request.setProtocol(ProtocolToken.REDIS);
+                    request.setServiceURI("/test");
+                    request.setSource("127.0.0.1");
+                    System.out.println(redisCaller.call(request));
+                    
+                    request = new Request();
+                    request.setMethod("addDouble");
+                    request.setParams(Arrays.asList(1.1d,2.0d));
+                    request.setProtocol(ProtocolToken.REDIS);
+                    request.setServiceURI("/test");
+                    request.setSource("127.0.0.1");
+                    System.out.println(redisCaller.call(request));
+                    
+                    request = new Request();
+                    request.setMethod("getDoubleList");
+                    request.setParams(null);
+//                    request.setParams(Arrays.asList());
+                    request.setProtocol(ProtocolToken.REDIS);
+                    request.setServiceURI("/test");
+                    request.setSource("127.0.0.1");
+                    System.out.println(redisCaller.call(request));
+                    
+                    
                     
                 } catch (Exception e) {
                     e.printStackTrace();
