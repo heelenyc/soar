@@ -37,4 +37,6 @@ public interface IDemoInterface {
     ParamsBean[] getBeanPArray();
 
     Double addList(List<ParamsBean> beanList);
+    
+    Double addListDouble(List<Double> beanList);
 }

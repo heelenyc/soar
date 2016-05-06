@@ -1,12 +1,14 @@
 package heelenyc.soar.server.demo.impl;
 
+import heelenyc.soar.core.demo.api.IDemoInterface;
+import heelenyc.soar.core.demo.api.ParamsBean;
+
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import heelenyc.soar.core.demo.api.IDemoInterface;
-import heelenyc.soar.core.demo.api.ParamsBean;
 
 /**
  * @author yicheng
@@ -56,38 +58,58 @@ public class DemoImplement implements IDemoInterface {
 
     @Override
     public Set<Double> getDoubleSet() {
-        // TODO Auto-generated method stub
-        return null;
+        HashSet<Double> ret = new HashSet<Double>();
+        ret.add(2.0d);
+        ret.add(1.0d);
+        return ret;
     }
 
     @Override
     public Set<ParamsBean> getBeanSet() {
-        // TODO Auto-generated method stub
-        return null;
+        ParamsBean bean = new ParamsBean();
+        bean.setOp1(2.1d);
+        bean.setOp2(3.1d);
+        
+        HashSet<ParamsBean> ret = new HashSet<ParamsBean>();
+        ret.add(bean);
+        return ret;
     }
 
     @Override
     public Map<String, Double> getDoubleMap() {
-        // TODO Auto-generated method stub
-        return null;
+        HashMap<String,Double> ret = new HashMap<String,Double>();
+        ret.put("lisi",2.0d);
+        ret.put("zhangsan",1.0d);
+        return ret;
     }
 
     @Override
     public Map<String, ParamsBean> getBeanMap() {
-        // TODO Auto-generated method stub
-        return null;
+        ParamsBean bean = new ParamsBean();
+        bean.setOp1(2.1d);
+        bean.setOp2(3.1d);
+        
+        HashMap<String,ParamsBean> ret = new HashMap<String,ParamsBean>();
+        ret.put("zhangsan",bean);
+        return ret;
     }
 
     @Override
     public Double[] getDoublePArray() {
-        // TODO Auto-generated method stub
-        return null;
+        return (Double[]) Arrays.asList(1.0d,2.1d).toArray();
     }
 
     @Override
     public ParamsBean[] getBeanPArray() {
-        // TODO Auto-generated method stub
-        return null;
+        ParamsBean bean = new ParamsBean();
+        bean.setOp1(2.1d);
+        bean.setOp2(3.1d);
+        return (ParamsBean[]) Arrays.asList(bean,bean).toArray();
+    }
+
+    @Override
+    public Double addListDouble(List<Double> beanList) {
+        return 3.0d;
     }
 
 }

@@ -97,6 +97,7 @@ public class RedisCaller implements IRemoteCaller {
 
             hashKey = req.hashKey().toString();
             String reqStr = JsonUtils.toJSON(req);
+            logger.info("send requst cost byte : " + reqStr.getBytes().length);
             redisDao = getRedisService(hashKey);
             String ret = redisDao.get(reqStr);
 

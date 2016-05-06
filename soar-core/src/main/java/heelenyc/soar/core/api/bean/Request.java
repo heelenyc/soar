@@ -20,7 +20,7 @@ public class Request implements Serializable{
     // for to call
     private String serviceURI;
     private String method;
-    private Object params;
+    private Object[] params;
     private int protocol; // java 和 非 java 的
 
     // additinal info
@@ -66,7 +66,7 @@ public class Request implements Serializable{
         return params;
     }
 
-    public void setParams(Object params) {
+    public void setParams(Object... params) {
         this.params = params;
     }
 

@@ -19,7 +19,7 @@ public class TcpRequestEncoder extends MessageToByteEncoder<RequestBytePacket> {
 
     @Override
     public void encode(ChannelHandlerContext ctx, RequestBytePacket msg, ByteBuf out) throws Exception {
-        logger.debug("TcpRequestEncoder: " + msg);
+        logger.info("TcpRequestEncoder send bytes : " + ( msg.getBody().length + msg.getHeader().length));
         msg.write(out);
     }
 
