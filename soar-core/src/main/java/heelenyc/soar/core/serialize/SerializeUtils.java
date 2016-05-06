@@ -8,7 +8,7 @@ package heelenyc.soar.core.serialize;
  */
 public class SerializeUtils {
     
-    private static ISerializer serializer = new JavaSerializeUtils();
+    private static ISerializer serializer = new HessianSerializeUtils();
     /**
      * 
      * 纯hessian序列化
@@ -36,6 +36,11 @@ public class SerializeUtils {
     }
     
     public static void main(String[] args) throws Exception {
-        System.out.println(SerializeUtils.serialize(new Integer[]{1,2}));
+        
+//        Object obj = new Integer(1);
+//        
+//        byte[] b = SerializeUtils.serialize(new Integer[]{1,2});
+//        
+//        System.out.println(b.length);
     }
 }

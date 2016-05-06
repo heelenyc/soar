@@ -207,7 +207,7 @@ public abstract class AbstractRedisCommandHandler extends SimpleChannelInboundHa
                 break;
             }
             // 出现idle 关闭会话
-            ctx.close();
+            // ctx.close();
         } else {
             super.userEventTriggered(ctx, evt);
         }

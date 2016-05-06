@@ -31,20 +31,20 @@ import redis.clients.jedis.JedisPool;
 public class RedisCaller implements IRemoteCaller {
 
     private Logger logger = LogUtils.getLogger(SoarConsumer.class);
-    
+
     private IHashLocator nodeLocator;
     private AbstractServiceListner listner;
     private String uri;
     private String apiClassName;
     private Map<String, JedisPool> redisServiceMap;
-    
+
     /**
      * 
      */
     public RedisCaller(String uri, String hashModel, String apiClassName) {
         try {
-            List<String> serviceAddressList = SoarKeeperManager.getServiceAddress(uri,ProtocolToken.REDIS);
-
+            List<String> serviceAddressList = SoarKeeperManager.getServiceAddress(uri, ProtocolToken.REDIS);
+            LogUtils.info(logger, "RedisCaller get serviceAddressList {2} for targetUri={0} apiClassName={1} ", uri, apiClassName, serviceAddressList);
             if (serviceAddressList == null || serviceAddressList.size() == 0) {
                 LogUtils.warn(logger, "cannot get any instance for service uri {0}", uri);
                 // throw new
@@ -97,18 +97,19 @@ public class RedisCaller implements IRemoteCaller {
 
             hashKey = req.hashKey().toString();
             String reqStr = JsonUtils.toJSON(req);
-            logger.info("send requst cost byte : " + reqStr.getBytes().length);
+            // logger.info("send requst cost byte : " +
+            // reqStr.getBytes().length);
             redisDao = getRedisService(hashKey);
             String ret = redisDao.get(reqStr);
 
             Response response = JsonUtils.toT(ret, Response.class);
 
             return response;
-            
+
         } catch (Exception e) {
             LogUtils.error(logger, e, e.getMessage());
             throw new RuntimeException(StringUtils.format("RedisCaller error for {0} ", req));
-            
+
         } finally {
             if (redisDao != null) {
                 returnRedisService(hashKey, redisDao);
@@ -130,26 +131,26 @@ public class RedisCaller implements IRemoteCaller {
             redisServiceMap.get(targetHostPort).returnResource(redis);
         }
     }
-    
+
     @Override
     public void listenService() {
         // 增加 listner
-        listner = new AbstractServiceListner(getUri()) {
+        listner = new AbstractServiceListner(getUri(),ProtocolToken.REDIS) {
 
             @Override
-            public void onRecover(String uri, String hostport) {
+            public void onRemove(String uri, String hostport, int protocol) {
                 LogUtils.info(logger, "onRecover {0} {1}", uri, hostport);
                 nodeLocator.addNode(hostport);
             }
 
             @Override
-            public void onPublish(String uri, String hostport) {
+            public void onPublish(String uri, String hostport, int protocol) {
                 LogUtils.info(logger, "onPublish {0} {1}", uri, hostport);
                 nodeLocator.addNode(hostport);
             }
 
             @Override
-            public void onIsolate(String uri, String hostport) {
+            public void onIsolate(String uri, String hostport, int protocol) {
                 LogUtils.info(logger, "onIsolate {0} {1}", uri, hostport);
                 nodeLocator.removeNode(hostport);
             }

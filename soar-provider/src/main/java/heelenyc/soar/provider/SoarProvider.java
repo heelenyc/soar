@@ -1,6 +1,7 @@
 package heelenyc.soar.provider;
 
 import heelenyc.commonlib.LogUtils;
+import heelenyc.soar.core.api.bean.ProtocolToken;
 import heelenyc.soar.core.api.bean.Request;
 import heelenyc.soar.core.keeper.SoarKeeperManager;
 import heelenyc.soar.provider.executor.IExecutor;
@@ -67,7 +68,8 @@ public class SoarProvider {
             apiClassNameList.add(apiClassName);
 
             // 向中心报告
-            SoarKeeperManager.publisService(targetUri, getLocalHostport());
+            SoarKeeperManager.publisService(targetUri, getTcpHostport(), ProtocolToken.JAVA);
+            SoarKeeperManager.publisService(targetUri, getRedisHostport(), ProtocolToken.REDIS);
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -76,29 +78,35 @@ public class SoarProvider {
         return true;
     }
 
+    /**
+     * @return
+     */
+    private String getRedisHostport() {
+        return localHost + ":" + (port + 1);
+    }
+
+    /**
+     * @return
+     */
+    private String getTcpHostport() {
+        return localHost + ":" + port;
+    }
+
     public void start() {
         try {
             TcpCommandHandler tcpHandler = new TcpCommandHandler(this);
             tcpServer = new SimpleTcpServer(tcpHandler);
-            tcpServer.start(localHost + ":" + port);
+            tcpServer.start(getTcpHostport());
 
             RedisCommandHandler handler = new RedisCommandHandler(this);
             redisServer = new SimpleRedisServer(handler);
-            redisServer.start(localHost + ":" + (port + 1));
+            redisServer.start(getRedisHostport());
 
         } catch (Exception e) {
             LogUtils.error(logger, e, "SoarProvider start error !");
             // throw new RuntimeException("SoarProvider start error !", e);
             System.exit(1);
         }
-    }
-
-    public String getLocalHostport() {
-        return localHost;
-    }
-
-    public void setLocalHostport(String localHostport) {
-        this.localHost = localHostport;
     }
 
     public IExecutor<Request> getExecutor() {
@@ -135,6 +143,14 @@ public class SoarProvider {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    public String getLocalHost() {
+        return localHost;
+    }
+
+    public void setLocalHost(String localHost) {
+        this.localHost = localHost;
     }
 
 }

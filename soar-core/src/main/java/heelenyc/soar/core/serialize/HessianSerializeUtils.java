@@ -30,7 +30,13 @@ public class HessianSerializeUtils implements ISerializer {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         HessianSerializerOutput hessianOutput = new HessianSerializerOutput(os);
         hessianOutput.writeObject(object);
+        hessianOutput.flush();
         return os.toByteArray();
+        
+//        Hessian2Output output = new Hessian2Output(os);
+//        output.writeObject(object);
+//        output.flush();
+//        return os.toByteArray();
 
     }
 

@@ -122,7 +122,7 @@ public abstract class AbstractTcpCommandHandler extends SimpleChannelInboundHand
                 break;
             }
             // 出现idle 关闭会话
-            ctx.close();
+            // ctx.close();
         } else {
             super.userEventTriggered(ctx, evt);
         }

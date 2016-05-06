@@ -25,9 +25,9 @@ public class DemoClientBootstrap {
      * @throws InterruptedException
      */
     public static void main(String[] args) {
-//        testTcp();
+        testTcp();
         
-         testRedis();
+//         testRedis();
     }
 
     /**

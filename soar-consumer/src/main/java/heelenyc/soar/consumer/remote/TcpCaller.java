@@ -52,7 +52,7 @@ public class TcpCaller implements IRemoteCaller {
             if (serviceAddressList == null || serviceAddressList.size() == 0) {
                 LogUtils.warn(logger, "cannot get any instance for service uri {0}", uri);
             } else {
-                LogUtils.warn(logger, "get instance for service uri {0} : {1}", uri, serviceAddressList);
+                 LogUtils.info(logger, "TcpCaller getserviceAddressList {2} for targetUri={0} apiClassName={1} ", uri, apiClassName, serviceAddressList);
             }
             this.uri = uri;
 
@@ -136,11 +136,11 @@ public class TcpCaller implements IRemoteCaller {
     private TcpCallClient getTcpCallClient(Request req) throws Exception {
         String key = req.hashKey().toString();
         String targetHostPort = nodeLocator.getNodeByKey(key);
-        
+
         if (StringUtils.isEmpty(targetHostPort)) {
             throw new RuntimeException(StringUtils.format("TcpCaller cannot get a node for {0} ", req));
         }
-        
+
         if (targetHostPort != null && tcpCallerClientMap.get(targetHostPort) == null) {
             String[] items = targetHostPort.split(":");
             tcpCallerClientMap.put(targetHostPort, new TcpCallClient(Integer.valueOf(items[1]), items[0]));
@@ -151,22 +151,22 @@ public class TcpCaller implements IRemoteCaller {
     @Override
     public void listenService() {
         // 增加 listner
-        listner = new AbstractServiceListner(getUri()) {
+        listner = new AbstractServiceListner(getUri(),ProtocolToken.JAVA) {
 
             @Override
-            public void onRecover(String uri, String hostport) {
+            public void onRemove(String uri, String hostport, int protocol) {
                 LogUtils.info(logger, "onRecover {0} {1}", uri, hostport);
                 nodeLocator.addNode(hostport);
             }
 
             @Override
-            public void onPublish(String uri, String hostport) {
+            public void onPublish(String uri, String hostport, int protocol) {
                 LogUtils.info(logger, "onPublish {0} {1}", uri, hostport);
                 nodeLocator.addNode(hostport);
             }
 
             @Override
-            public void onIsolate(String uri, String hostport) {
+            public void onIsolate(String uri, String hostport, int protocol) {
                 LogUtils.info(logger, "onIsolate {0} {1}", uri, hostport);
                 nodeLocator.removeNode(hostport);
             }
