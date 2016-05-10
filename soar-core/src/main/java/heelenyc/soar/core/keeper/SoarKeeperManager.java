@@ -42,7 +42,7 @@ public class SoarKeeperManager {
         LogUtils.info(logger, "publisService targetUri={0} hostport={1} protocol={2}", targetUri,localHostport,protocol);
         CuratorFramework client = ZKClientFactory.getZooKeeperClient(ZkConstants.NAMESPACE_SERVICE);
 
-        SimpleZKUtils.replaceEphemeral(client, ZkConstants.getServiceNodePath(targetUri, localHostport, protocol), System.currentTimeMillis() + "");
+        SimpleZKUtils.replaceEphemeral(client, ZkConstants.getServiceNodePath(targetUri, localHostport, protocol), ZkConstants.STATE_PUBLISHED);
     }
 
     /**
@@ -51,10 +51,14 @@ public class SoarKeeperManager {
      * @throws Exception
      */
     public static List<String> getServiceAddress(String uri, int protocol) throws Exception {
-        
-        CuratorFramework client = ZKClientFactory.getZooKeeperClient(ZkConstants.NAMESPACE_SERVICE);
         List<String> children = new ArrayList<String>();
-        children = client.getChildren().forPath(ZkConstants.getServicePath(uri, protocol));
+        try {
+            CuratorFramework client = ZKClientFactory.getZooKeeperClient(ZkConstants.NAMESPACE_SERVICE);
+            children = new ArrayList<String>();
+            children = client.getChildren().forPath(ZkConstants.getServicePath(uri, protocol));
+        } catch (Exception e) {
+            LogUtils.error(logger, e,"getServiceAddress error! ");
+        }
         return children;
     }
 

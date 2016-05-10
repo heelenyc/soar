@@ -41,7 +41,7 @@ public class RedisCaller implements IRemoteCaller {
     /**
      * 
      */
-    public RedisCaller(String uri, String hashModel, String apiClassName) {
+    public RedisCaller(String uri, int hashModel, String apiClassName) {
         try {
             List<String> serviceAddressList = SoarKeeperManager.getServiceAddress(uri, ProtocolToken.REDIS);
             LogUtils.info(logger, "RedisCaller get serviceAddressList {2} for targetUri={0} apiClassName={1} ", uri, apiClassName, serviceAddressList);
@@ -54,7 +54,7 @@ public class RedisCaller implements IRemoteCaller {
             }
             this.uri = uri;
 
-            if ("MOD".equalsIgnoreCase(hashModel)) {
+            if (ProtocolToken.HASH_MOD == hashModel ) {
                 nodeLocator = new ModLocator(serviceAddressList);
                 LogUtils.info(logger, "create MOD hashLocator");
             } else {
@@ -139,7 +139,7 @@ public class RedisCaller implements IRemoteCaller {
 
             @Override
             public void onRemove(String uri, String hostport, int protocol) {
-                LogUtils.info(logger, "onRecover {0} {1}", uri, hostport);
+                LogUtils.info(logger, "onRemove {0} {1}", uri, hostport);
                 nodeLocator.addNode(hostport);
             }
 

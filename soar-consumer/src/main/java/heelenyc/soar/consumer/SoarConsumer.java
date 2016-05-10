@@ -39,7 +39,7 @@ public class SoarConsumer implements IConsumer {
     /**
      * 
      */
-    public SoarConsumer(String uri, String hashModel, String apiClassName) {
+    public SoarConsumer(String uri, int hashModel, String apiClassName) {
         try {
             caller = new RemoteCallerDecorater(uri, hashModel, apiClassName);
             this.uri = uri;
@@ -48,7 +48,7 @@ public class SoarConsumer implements IConsumer {
             // 初始化代理实例
             instance = ServiceProxy.newInstance(this);
         } catch (Exception e) {
-            LogUtils.error(logger, e, "construct SoarConsumer error for {0} {1}", uri, hashModel);
+            LogUtils.error(logger, e, "construct SoarConsumer error for uri:{0} hash:{1}", uri, hashModel);
             System.exit(0);
         }
     }

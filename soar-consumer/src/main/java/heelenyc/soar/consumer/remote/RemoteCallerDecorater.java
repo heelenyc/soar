@@ -13,7 +13,7 @@ public class RemoteCallerDecorater {
 
     private IRemoteCaller tcpCaller;
 
-    public RemoteCallerDecorater(String uri, String hashModel, String apiClassName) {
+    public RemoteCallerDecorater(String uri, int hashModel, String apiClassName) {
         try {
             tcpCaller = new TcpCaller(uri, hashModel, apiClassName);
         } catch (Exception e) {

@@ -48,6 +48,9 @@ public class SoarProvider {
             apiClassNameList = new ConcurrentSkipListSet<String>();
             uri2Impobj = new ConcurrentHashMap<String, Object>();
             methods = new ConcurrentHashMap<String, Method>();
+            
+            // 起端口服务
+            start();
 
         } catch (Exception e) {
             LogUtils.error(logger, e, "SoarProvider construct error !");

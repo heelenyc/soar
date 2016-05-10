@@ -36,7 +36,7 @@ public class DemoClientBootstrap {
     private static void testRedis() {
         try {
 
-            IRemoteCaller redisCaller = new RedisCaller("/test", "mod", IDemoInterface.class.getName());
+            IRemoteCaller redisCaller = new RedisCaller("/test", ProtocolToken.HASH_KETAMA, IDemoInterface.class.getName());
 
             long start = System.currentTimeMillis();
             for (int i = 0; i < 1; i++) {
@@ -179,7 +179,7 @@ public class DemoClientBootstrap {
     private static void testTcp() {
       try {
 
-          SoarConsumer consumer = new SoarConsumer("/test", "mod", IDemoInterface.class.getName());
+          SoarConsumer consumer = new SoarConsumer("/test", ProtocolToken.HASH_MOD, IDemoInterface.class.getName());
 
           long start = System.currentTimeMillis();
           IDemoInterface service = consumer.getInstance();

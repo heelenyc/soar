@@ -45,18 +45,19 @@ public class TcpCaller implements IRemoteCaller {
     /**
      * 
      */
-    public TcpCaller(String uri, String hashModel, String apiClassName) {
+    public TcpCaller(String uri, int hashModel, String apiClassName) {
         try {
             List<String> serviceAddressList = SoarKeeperManager.getServiceAddress(uri, ProtocolToken.JAVA);
 
             if (serviceAddressList == null || serviceAddressList.size() == 0) {
-                LogUtils.warn(logger, "cannot get any instance for service uri {0}", uri);
+                LogUtils.error(logger, "cannot get any instance for service uri {0}", uri);
+                throw new RuntimeException("cannot get any instance for service uri :" + uri);
             } else {
-                 LogUtils.info(logger, "TcpCaller getserviceAddressList {2} for targetUri={0} apiClassName={1} ", uri, apiClassName, serviceAddressList);
+                LogUtils.info(logger, "TcpCaller getserviceAddressList {2} for targetUri={0} apiClassName={1} ", uri, apiClassName, serviceAddressList);
             }
             this.uri = uri;
 
-            if ("MOD".equalsIgnoreCase(hashModel)) {
+            if (ProtocolToken.HASH_MOD == hashModel) {
                 nodeLocator = new ModLocator(serviceAddressList);
                 LogUtils.info(logger, "create MOD hashLocator");
             } else {
@@ -151,12 +152,12 @@ public class TcpCaller implements IRemoteCaller {
     @Override
     public void listenService() {
         // 增加 listner
-        listner = new AbstractServiceListner(getUri(),ProtocolToken.JAVA) {
+        listner = new AbstractServiceListner(getUri(), ProtocolToken.JAVA) {
 
             @Override
             public void onRemove(String uri, String hostport, int protocol) {
-                LogUtils.info(logger, "onRecover {0} {1}", uri, hostport);
-                nodeLocator.addNode(hostport);
+                LogUtils.info(logger, "onRemove {0} {1}", uri, hostport);
+                nodeLocator.removeNode(hostport);
             }
 
             @Override
@@ -168,6 +169,7 @@ public class TcpCaller implements IRemoteCaller {
             @Override
             public void onIsolate(String uri, String hostport, int protocol) {
                 LogUtils.info(logger, "onIsolate {0} {1}", uri, hostport);
+                // 隔离的逻辑
                 nodeLocator.removeNode(hostport);
             }
         };

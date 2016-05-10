@@ -36,27 +36,27 @@ public abstract class AbstractServiceListner {
         // 初始化watcher
         CuratorFramework client = ZKClientFactory.getZooKeeperClient(ZkConstants.NAMESPACE_SERVICE);
         String path = ZkConstants.getServicePath(uri, protocol);
+        LogUtils.info(logger, "AbstractServiceListner watch : {0}", path);
         watcher = new PathChildrenCache(client, path, true);
-
         watcher.getListenable().addListener(new PathChildrenCacheListener() {
 
             @Override
             public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
                 switch (event.getType()) {
                 case INITIALIZED:
-                    LogUtils.info(logger, "{0}@{1} INITIALIZED", uri, protocol);
+                    LogUtils.info(logger, "INITIALIZED", uri, protocol);
                     break;
                 case CHILD_ADDED:
                     // 新加节点 或者节点被修改需要更新
-                    LogUtils.info(logger, "{0}@{1} CHILD_ADDED : {2}", uri, protocol, event.getData());
+                    LogUtils.info(logger, "CHILD_ADDED : {2}", uri, protocol, event.getData());
                     process(uri, protocol, event.getData());
                     break;
                 case CHILD_UPDATED:
-                    LogUtils.info(logger, "{0}@{1} CHILD_UPDATED : {2}", uri, protocol, event.getData());
+                    LogUtils.info(logger, "CHILD_UPDATED : {2}", uri, protocol, event.getData());
                     process(uri, protocol, event.getData());
                     break;
                 case CHILD_REMOVED:
-                    LogUtils.info(logger, "{0}@{1} CHILD_REMOVED : {2}", uri, protocol, event.getData());
+                    LogUtils.info(logger, "CHILD_REMOVED : {2}", uri, protocol, event.getData());
                     String nodePath = event.getData().getPath();
                     String hostport = nodePath.substring(nodePath.lastIndexOf('/') + 1);
                     onRemove(uri, hostport, protocol);
@@ -66,6 +66,12 @@ public abstract class AbstractServiceListner {
                 }
             }
         });
+        try {
+            watcher.start();
+        } catch (Exception e) {
+            LogUtils.error(logger, e, "wactch {0} erorr!", path);
+            System.exit(0);
+        }
     }
 
     /**
@@ -77,10 +83,11 @@ public abstract class AbstractServiceListner {
         
         String nodePath = data.getPath();
         String hostport = nodePath.substring(nodePath.lastIndexOf('/') + 1);
-        if(ZkConstants.STATE_WORKING.equals(String.valueOf(data.getData()))){
+        String dataStr = new String(data.getData());
+        if(ZkConstants.STATE_PUBLISHED.equals(dataStr)){
             onPublish(uri, hostport, protocol);
         }
-        if(ZkConstants.STATE_ISOLATED.equals(String.valueOf(data.getData()))){
+        if(ZkConstants.STATE_ISOLATED.equals(dataStr)){
             onIsolate(uri, hostport, protocol);
         }
     }

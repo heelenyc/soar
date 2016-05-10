@@ -10,7 +10,7 @@ import heelenyc.soar.core.api.bean.ProtocolToken;
 public class ZkConstants {
     
     // 节点状态
-    public static final String STATE_WORKING = "working";
+    public static final String STATE_PUBLISHED = "published";
     public static final String STATE_ISOLATED = "isolated";
 
     // 域名
@@ -38,7 +38,7 @@ public class ZkConstants {
     private static String getProtocolPath(int protocol) {
         if (protocol == ProtocolToken.JAVA) {
             return PATH_PROTOCOL_TCP;
-        } else if (protocol == ProtocolToken.JAVA) {
+        } else if (protocol == ProtocolToken.REDIS) {
             return PATH_PROTOCOL_REDIS;
         } else {
             return "unknow";
