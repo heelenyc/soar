@@ -185,7 +185,7 @@ public class DemoClientBootstrap {
 
           long start = System.currentTimeMillis();
           IDemoInterface service = consumer.getInstance();
-          for (int i = 0; i < 1; i++) {
+          for (int i = 0; i < 10; i++) {
               try {
                   if (i % 1000 == 0) {
                       System.out.println("+++++++++++++++++++++++++=========>  " + i);

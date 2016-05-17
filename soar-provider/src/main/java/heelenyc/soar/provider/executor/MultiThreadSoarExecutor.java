@@ -1,5 +1,6 @@
 package heelenyc.soar.provider.executor;
 
+import heelenyc.soar.core.api.bean.ProtocolToken;
 import heelenyc.soar.core.api.bean.Request;
 import heelenyc.soar.core.api.bean.Response;
 
@@ -10,13 +11,13 @@ import java.lang.reflect.Method;
  * @since 2016年3月18日
  * 
  */
-public class SingleThreadSoarExecutor extends AbstractSoarExecutor {
+public class MultiThreadSoarExecutor extends AbstractSoarExecutor {
 
     // private Logger logger =
     // LogUtils.getLogger(SingleThreadSoarExecutor.class);
 
-    public SingleThreadSoarExecutor() {
-        super(1);
+    public MultiThreadSoarExecutor() {
+        super(ProtocolToken.THEADPOOL_PROVIDOR_SIZE);
     }
 
     @Override

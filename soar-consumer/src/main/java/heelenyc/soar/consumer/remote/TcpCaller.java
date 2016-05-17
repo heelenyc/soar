@@ -9,6 +9,7 @@ import heelenyc.soar.consumer.remote.tcp.TcpCallClient;
 import heelenyc.soar.core.api.bean.ProtocolToken;
 import heelenyc.soar.core.api.bean.Request;
 import heelenyc.soar.core.api.bean.Response;
+import heelenyc.soar.core.api.bean.Response.ResponseCode;
 import heelenyc.soar.core.keeper.SoarKeeperManager;
 import heelenyc.soar.core.keeper.listner.AbstractServiceListner;
 import io.netty.util.internal.ConcurrentSet;
@@ -50,7 +51,7 @@ public class TcpCaller implements IRemoteCaller {
     private ScheduledExecutorService checkexecutor = Executors.newScheduledThreadPool(1);
 
     // 执行线程池
-    private ExecutorService executor = Executors.newFixedThreadPool(ProtocolToken.THEADPOOL_SIZE);
+    private ExecutorService executor = Executors.newFixedThreadPool(ProtocolToken.THEADPOOL_CONSUMER_SIZE);
 
     /**
      * 
@@ -165,13 +166,13 @@ public class TcpCaller implements IRemoteCaller {
             return future.get(ProtocolToken.TIME_OUT_IN_MS, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             LogUtils.error(logger, e, "call error!");
-            return Response.ERROR_RESP;
+            return new Response(req.getId(),ResponseCode.SERVER_ERORR.getValue(),"server error");
         } catch (ExecutionException e) {
             LogUtils.error(logger, e, "call error!");
-            return Response.ERROR_RESP;
+            return new Response(req.getId(),ResponseCode.SERVER_ERORR.getValue(),"server error");
         } catch (TimeoutException e) {
             LogUtils.error(logger, e, "call error!");
-            return Response.TIMEOUT_RESP;
+            return new Response(req.getId(),ResponseCode.TIME_OUT.getValue(),"server error");
         }
 
     }

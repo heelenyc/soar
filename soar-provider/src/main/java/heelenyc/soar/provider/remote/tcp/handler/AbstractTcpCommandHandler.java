@@ -3,7 +3,6 @@ package heelenyc.soar.provider.remote.tcp.handler;
 import heelenyc.soar.core.api.bean.Request;
 import heelenyc.soar.core.api.bean.RequestBytePacket;
 import heelenyc.soar.core.api.bean.ResponseBytePacket;
-import heelenyc.soar.core.serialize.SerializeUtils;
 import heelenyc.soar.provider.remote.api.ClientInfo;
 import heelenyc.soar.provider.remote.global.Constants;
 import heelenyc.soar.provider.remote.global.Context;

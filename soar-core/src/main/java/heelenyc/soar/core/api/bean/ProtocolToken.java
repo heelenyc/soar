@@ -19,5 +19,7 @@ public class ProtocolToken {
     
     public static final int PREHEATING_TIMESPAN_IN_MS = 20 * 1000;
     
-    public static final int THEADPOOL_SIZE = 100;
+    public static final int THEADPOOL_CONSUMER_SIZE = 10;
+    
+    public static final int THEADPOOL_PROVIDOR_SIZE = 100;
 }

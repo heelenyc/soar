@@ -14,8 +14,8 @@ public class Response implements Serializable {
      */
     private static final long serialVersionUID = 1L;
     
-    public transient static Response TIMEOUT_RESP = new Response(ResponseCode.TIME_OUT.getValue(),"timeout");
-    public transient static Response ERROR_RESP = new Response(ResponseCode.SERVER_ERORR.getValue(),"server error");
+    public transient static Response TIMEOUT_RESP = new Response(System.nanoTime(),ResponseCode.TIME_OUT.getValue(),"timeout");
+    public transient static Response ERROR_RESP = new Response(System.nanoTime(),ResponseCode.SERVER_ERORR.getValue(),"server error");
     
     private Long id;
     private int ec;
@@ -29,7 +29,8 @@ public class Response implements Serializable {
      * @param value
      * @param string
      */
-    public Response(int ec, String em) {
+    public Response(Long id,int ec, String em) {
+        this.id = id;
         this.ec = ec;
         this.em = em;
     }

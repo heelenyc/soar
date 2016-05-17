@@ -44,9 +44,7 @@ public class TcpCommandHandler extends AbstractTcpCommandHandler {
             }
             
         } catch (Exception e) {
-            resp = new Response();
-            resp.setEc(ResponseCode.SERVER_ERORR.getValue());
-            resp.setEm(e.getMessage());
+            resp = Response.ERROR_RESP;
             logger.error(e.getMessage(), e);
         }
         ResponseBytePacket responseBytePacket = new ResponseBytePacket(resp);
