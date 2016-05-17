@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author yicheng
@@ -29,6 +30,11 @@ public class DemoImplement implements IDemoInterface {
     
     @Override
     public Double addDouble(Double op1, Double op2) {
+        try {
+            // TimeUnit.SECONDS.sleep(4);
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
         return op1 + op2;
     }
 

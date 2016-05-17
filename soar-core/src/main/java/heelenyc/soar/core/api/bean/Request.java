@@ -2,14 +2,13 @@ package heelenyc.soar.core.api.bean;
 
 import java.io.Serializable;
 
-
 /**
  * @author yicheng
  * @since 2016年3月18日
  * 
  */
-public class Request implements Serializable{
-    
+public class Request implements Serializable {
+
     /**
      * 
      */
@@ -51,7 +50,8 @@ public class Request implements Serializable{
     }
 
     public Integer hashKey() {
-        return (getServiceURI() +"@"+ getSource()).hashCode();
+//        return (getServiceURI() + "@" + getSource()).hashCode();
+        return (getServiceURI() + "@" + getSource()).hashCode() +  Long.valueOf(Math.round(Math.random() * 10)).intValue();
     }
 
     public int getProtocol() {
@@ -82,6 +82,5 @@ public class Request implements Serializable{
     public void setId(Long id) {
         this.id = id;
     }
-
 
 }

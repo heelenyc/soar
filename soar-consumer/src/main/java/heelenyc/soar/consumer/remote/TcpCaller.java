@@ -16,11 +16,17 @@ import io.netty.util.internal.ConcurrentSet;
 import java.nio.channels.ClosedChannelException;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.log4j.Logger;
 
@@ -40,7 +46,11 @@ public class TcpCaller implements IRemoteCaller {
     private Map<String, TcpCallClient> tcpCallerClientMap;
 
     private Set<String> blacList = new ConcurrentSet<String>(); // 不可用服务的黑名单
-    private ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+    private Map<String, Long> preHeatMap = new ConcurrentHashMap<String, Long>(); // 预热
+    private ScheduledExecutorService checkexecutor = Executors.newScheduledThreadPool(1);
+
+    // 执行线程池
+    private ExecutorService executor = Executors.newFixedThreadPool(ProtocolToken.THEADPOOL_SIZE);
 
     /**
      * 
@@ -71,7 +81,7 @@ public class TcpCaller implements IRemoteCaller {
 
             this.apiClassName = apiClassName;
 
-            executor.scheduleWithFixedDelay(new Runnable() {
+            checkexecutor.scheduleWithFixedDelay(new Runnable() {
 
                 @Override
                 public void run() {
@@ -83,6 +93,16 @@ public class TcpCaller implements IRemoteCaller {
                             logger.warn("to recover  " + add);
                             nodeLocator.addNode(add);
                             blacList.remove(add);
+                        }
+                    }
+
+                    if (!preHeatMap.isEmpty()) {
+                        logger.warn("attempt to process preheating :  " + preHeatMap.keySet());
+                    }
+                    for (Entry<String, Long> preheatItem : preHeatMap.entrySet()) {
+                        if (System.currentTimeMillis() - preheatItem.getValue() > ProtocolToken.PREHEATING_TIMESPAN_IN_MS) {
+                            logger.warn("to remove preheating host :  " + preheatItem.getKey());
+                            preHeatMap.remove(preheatItem.getKey());
                         }
                     }
                 }
@@ -111,35 +131,73 @@ public class TcpCaller implements IRemoteCaller {
     }
 
     @Override
-    public Response call(Request req) {
-        TcpCallClient tcpCallerClient = null;
-        String hashKey = null;
+    public Response call(final Request req) {
+
+        // 放到线程池中执行
+        Future<Response> future = executor.submit(new Callable<Response>() {
+
+            @Override
+            public Response call() throws Exception {
+                TcpCallClient tcpCallerClient = null;
+                String hashKey = null;
+                try {
+                    hashKey = req.hashKey().toString();
+                    tcpCallerClient = getTcpCallClient(req);
+                    Response response = tcpCallerClient.sendRequest(req);
+                    return response;
+
+                } catch (ClosedChannelException e) {
+                    // 连接关闭
+                    String targetHostPort = nodeLocator.getNodeByKey(hashKey);
+                    if (StringUtils.isNotEmpty(targetHostPort)) {
+                        blacList.add(targetHostPort);
+                        nodeLocator.removeNode(targetHostPort);
+                    }
+                    throw new RuntimeException(StringUtils.format("TcpCaller ocurr ClosedChannelException error for {0} at {1} ", req, targetHostPort));
+                } catch (Exception e) {
+                    LogUtils.error(logger, e, e.getMessage());
+                    throw new RuntimeException(StringUtils.format("TcpCaller error for {0} ", req));
+                }
+            }
+        });
+        // 要考虑超时
         try {
-            hashKey = req.hashKey().toString();
-            tcpCallerClient = getTcpCallClient(req);
-            Response response = tcpCallerClient.sendRequest(req);
-            return response;
-
-        } catch (ClosedChannelException e) {
-            // 连接关闭
-            String targetHostPort = nodeLocator.getNodeByKey(hashKey);
-            blacList.add(targetHostPort);
-            nodeLocator.removeNode(targetHostPort);
-            throw new RuntimeException(StringUtils.format("TcpCaller error for {0} ", req));
-        } catch (Exception e) {
-            LogUtils.error(logger, e, e.getMessage());
-            throw new RuntimeException(StringUtils.format("TcpCaller error for {0} ", req));
-        } finally {
-
+            return future.get(ProtocolToken.TIME_OUT_IN_MS, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            LogUtils.error(logger, e, "call error!");
+            return Response.ERROR_RESP;
+        } catch (ExecutionException e) {
+            LogUtils.error(logger, e, "call error!");
+            return Response.ERROR_RESP;
+        } catch (TimeoutException e) {
+            LogUtils.error(logger, e, "call error!");
+            return Response.TIMEOUT_RESP;
         }
+
     }
 
     private TcpCallClient getTcpCallClient(Request req) throws Exception {
         String key = req.hashKey().toString();
         String targetHostPort = nodeLocator.getNodeByKey(key);
+        // LogUtils.info(logger, "getTcpCallClient for key {0}  : {1}", key,
+        // targetHostPort);
 
+        // 如果locator没有，肯定不正常
         if (StringUtils.isEmpty(targetHostPort)) {
             throw new RuntimeException(StringUtils.format("TcpCaller cannot get a node for {0} ", req));
+        }
+
+        // 如果是预热列列表，决定是否走预热的机器
+        targetHostPort = sureTargetHost(targetHostPort);
+        while (StringUtils.isEmpty(targetHostPort)) {
+            // 再hash
+            String reHashKey = key + Math.round(Math.random() * 100);
+            targetHostPort = nodeLocator.getNodeByKey(reHashKey);
+            // 如果locator没有，肯定不正常
+            if (StringUtils.isEmpty(targetHostPort)) {
+                throw new RuntimeException(StringUtils.format("TcpCaller cannot get a node for {0} ", req));
+            }
+            targetHostPort = sureTargetHost(targetHostPort);
         }
 
         if (targetHostPort != null && tcpCallerClientMap.get(targetHostPort) == null) {
@@ -147,6 +205,33 @@ public class TcpCaller implements IRemoteCaller {
             tcpCallerClientMap.put(targetHostPort, new TcpCallClient(Integer.valueOf(items[1]), items[0]));
         }
         return tcpCallerClientMap.get(targetHostPort);
+    }
+
+    /**
+     * 是否走越热机器逻辑： 预热机器 XX 秒内增加到全量请求，默认是20
+     * 
+     * @param targetHostPort
+     * @return
+     */
+    private String sureTargetHost(String targetHostPort) {
+        // LogUtils.info(logger, "sureTargetHost {0}", targetHostPort);
+        if (preHeatMap.containsKey(targetHostPort)) {
+            Long preHeattTime = preHeatMap.get(targetHostPort);
+            Long span = System.currentTimeMillis() - preHeattTime;
+            if (span > Math.random() * ProtocolToken.PREHEATING_TIMESPAN_IN_MS) {
+                // LogUtils.info(logger,
+                // "{0} preHeating and hit ,preheating time : {1}ms",
+                // targetHostPort, span);
+                return targetHostPort;
+            } else {
+                // LogUtils.info(logger,
+                // "{0} preHeating and not hit ,preheating time : {1}ms",
+                // targetHostPort, span);
+                return null;
+            }
+        } else {
+            return targetHostPort;
+        }
     }
 
     @Override
@@ -163,7 +248,8 @@ public class TcpCaller implements IRemoteCaller {
             @Override
             public void onPublish(String uri, String hostport, int protocol) {
                 LogUtils.info(logger, "onPublish {0} {1}", uri, hostport);
-                nodeLocator.addNode(hostport);
+                // 应该有预热逻辑
+                preheat(hostport);
             }
 
             @Override
@@ -173,6 +259,19 @@ public class TcpCaller implements IRemoteCaller {
                 nodeLocator.removeNode(hostport);
             }
         };
+    }
+
+    /**
+     * 预热逻辑
+     * 
+     * @param hostport
+     */
+    private void preheat(String hostport) {
+        if (nodeLocator.size() >= 1 && !nodeLocator.contains(hostport)) {
+            // 原来有机器的情况下才需要预热，否则根本没机器，不需要预热
+            preHeatMap.put(hostport, System.currentTimeMillis());
+        }
+        nodeLocator.addNode(hostport);
     }
 
     public String getUri() {

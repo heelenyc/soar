@@ -23,6 +23,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +46,8 @@ public class TcpCallClient {
 
     private volatile boolean isConnected = false;
     private volatile boolean isWorking = false;
-    private Map<Long, Object> syncLock = new ConcurrentHashMap<Long, Object>();
+    private Map<Long, ReentrantLock> syncLock = new ConcurrentHashMap<Long, ReentrantLock>();
+    private Map<Long, Condition> syncCon = new ConcurrentHashMap<Long, Condition>();
     private Map<Long, Response> syncResponse = new ConcurrentHashMap<Long, Response>();
 
     public TcpCallClient(final int port, final String host) throws Exception {
@@ -66,7 +69,7 @@ public class TcpCallClient {
             connect(port, host);
 
             executor.scheduleWithFixedDelay(new Runnable() {
-                
+
                 @Override
                 public void run() {
                     // 监控重连
@@ -88,7 +91,7 @@ public class TcpCallClient {
     }
 
     private void connect(int port, String host) throws InterruptedException {
-        
+
         ChannelFuture future = bootstrap.connect(new InetSocketAddress(host, port)).sync();
         channel = future.channel();
         if (channel.isActive()) {
@@ -96,7 +99,7 @@ public class TcpCallClient {
             setWorking(true);
         }
     }
-    
+
     private void reconnect(int port, String host) throws InterruptedException {
         if (channel != null && channel.isActive()) {
             setConnected(true);
@@ -114,32 +117,81 @@ public class TcpCallClient {
 
     /**
      * 关键是如何同步拿到结果
+     * 
      * @param req
      * @return
-     * @throws InterruptedException 
+     * @throws InterruptedException
      * @throws Exception
      */
-    public Response sendRequest(Request req) throws InterruptedException, Exception  {
+    public Response sendRequest(Request req) {
         if (channel != null) {
-            Object lock = new Object();
-            syncLock.put(req.getId(),lock );
-            channel.writeAndFlush(new RequestBytePacket(req)).sync();
+            ReentrantLock lock = new ReentrantLock();
+            Condition con = lock.newCondition();
+            syncLock.put(req.getId(), lock);
+            syncCon.put(req.getId(), con);
+
+            lock.lock();
             try {
-                synchronized (lock) {
-                    lock.wait(ProtocolToken.TIME_OUT);
-                }
+                channel.writeAndFlush(new RequestBytePacket(req)).sync();
+
+                con.await(ProtocolToken.TIME_OUT_IN_MS, TimeUnit.MILLISECONDS);
+
                 Response response = syncResponse.remove(req.getId());
+                // logger.info("Response " + response + " for sendRequest : " + req);
+
                 syncLock.remove(req.getId());
-                //lock = null;
-                
-                return response;
+                syncCon.remove(req.getId());
+
+                if (response != null) {
+                    return response;
+                } else {
+                    return Response.TIMEOUT_RESP;
+                }
+
             } catch (InterruptedException e) {
-                // TODO: 超时
+                syncResponse.remove(req.getId());
+                syncLock.remove(req.getId());
+                syncCon.remove(req.getId());
+
                 return Response.TIMEOUT_RESP;
+            } catch (Exception e) {
+                syncResponse.remove(req.getId());
+                syncLock.remove(req.getId());
+                syncCon.remove(req.getId());
+
+                return Response.ERROR_RESP;
+            } finally {
+                lock.unlock();
             }
-            
+
         } else {
             return Response.ERROR_RESP;
+        }
+    }
+
+    /**
+     * @param resp
+     */
+    public void returnResponse(Response resp) {
+        ReentrantLock lock = syncLock.get(resp.getId());
+        if (lock != null) {
+            lock.lock();
+            try {
+                Condition con = syncCon.get(resp.getId());
+                if (con != null) {
+                    syncResponse.put(resp.getId(), resp);
+                    con.signalAll();
+                } else {
+                    logger.info("condition is null, request must be discarded!");
+                }
+            } catch (Exception e) {
+
+            } finally {
+                lock.unlock();
+            }
+        } else {
+            // 请求已经被抛弃，do nothing
+            logger.info("lock is null, request must be discarded!");
         }
     }
 
@@ -162,7 +214,7 @@ public class TcpCallClient {
         this.isConnected = isConnected;
     }
 
-    public Map<Long, Object> getSyncLock() {
+    public Map<Long, ReentrantLock> getSyncLock() {
         return syncLock;
     }
 

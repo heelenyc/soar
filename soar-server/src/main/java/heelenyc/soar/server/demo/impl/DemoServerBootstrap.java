@@ -20,10 +20,16 @@ public class DemoServerBootstrap {
         SoarProvider provider1 = new SoarProvider("127.0.0.1",18188);
         provider1.registUri("/test", IDemoInterface.class.getName(), new DemoImplement());
         
-        TimeUnit.SECONDS.sleep(20);
+//        TimeUnit.SECONDS.sleep(20);
         
-        SoarProvider provider2 = new SoarProvider("127.0.0.1",18190);
-        provider2.registUri("/test", IDemoInterface.class.getName(), new DemoImplement());
+//        SoarProvider provider2 = new SoarProvider("127.0.0.1",18190);
+//        provider2.registUri("/test", IDemoInterface.class.getName(), new DemoImplement());
+//        
+//        TimeUnit.SECONDS.sleep(20);
+//        
+//        SoarProvider provider3 = new SoarProvider("127.0.0.1",18192);
+//        provider3.registUri("/test", IDemoInterface.class.getName(), new DemoImplement());
     }
+    
 
 }
