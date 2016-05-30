@@ -20,6 +20,7 @@ public class DemoServerBootstrap {
         SoarProvider provider1 = new SoarProvider("127.0.0.1",18188);
         provider1.registUri("/test", IDemoInterface.class.getName(), new DemoImplement());
         
+        provider1.wait(1l);
 //        TimeUnit.SECONDS.sleep(20);
         
 //        SoarProvider provider2 = new SoarProvider("127.0.0.1",18190);
