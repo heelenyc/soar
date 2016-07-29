@@ -82,8 +82,7 @@ public abstract class AbstractSoarExecutor implements IExecutor<Request> {
                         resp.setEm("OK");
 
                     } else {
-
-                        // 参数匹配的问题, 主要是pojo类参数
+                        // redis 协议 参数匹配的问题, 主要是pojo类参数
                         List<Object> params = new ArrayList<Object>();
                         Object[] rawParams = null;
                         if (request.getParams() != null) {

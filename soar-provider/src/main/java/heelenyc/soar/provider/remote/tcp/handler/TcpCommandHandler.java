@@ -4,8 +4,7 @@ import heelenyc.soar.core.api.bean.Request;
 import heelenyc.soar.core.api.bean.Response;
 import heelenyc.soar.core.api.bean.Response.ResponseCode;
 import heelenyc.soar.core.api.bean.ResponseBytePacket;
-import heelenyc.soar.provider.SoarProvider;
-import heelenyc.soar.provider.executor.IExecutor;
+import heelenyc.soar.provider.SoarProviderServer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,14 +18,10 @@ public class TcpCommandHandler extends AbstractTcpCommandHandler {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     
-    private IExecutor<Request> executor ;
-    private SoarProvider parentProvider;
     /**
      * @param soarProvider
      */
-    public TcpCommandHandler(SoarProvider provider) {
-        this.executor = provider.getExecutor();
-        this.parentProvider = provider;
+    public TcpCommandHandler() {
     }
 
     @Override
@@ -35,12 +30,12 @@ public class TcpCommandHandler extends AbstractTcpCommandHandler {
         try {
             logger.info("received Request : " + req.toString());
             
-            if (!parentProvider.hasUri(req.getServiceURI())) {
+            if (!SoarProviderServer.hasUri(req.getServiceURI())) {
                 resp = new Response();
                 resp.setEc(ResponseCode.INVALID_URI.getValue());
                 resp.setEm("invalid uri");
             }else {
-                resp = executor.executor(req,parentProvider.getMethod(req.getMethod()),parentProvider.getImpObj(req.getServiceURI()));
+                resp = SoarProviderServer.getExecutor().executor(req,SoarProviderServer.getMethod(req.getMethod()),SoarProviderServer.getImpObj(req.getServiceURI()));
             }
             
         } catch (Exception e) {
