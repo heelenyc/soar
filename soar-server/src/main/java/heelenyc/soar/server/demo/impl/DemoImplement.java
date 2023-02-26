@@ -1,14 +1,10 @@
 package heelenyc.soar.server.demo.impl;
 
+
 import heelenyc.soar.core.demo.api.IDemoInterface;
 import heelenyc.soar.core.demo.api.ParamsBean;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**

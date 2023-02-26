@@ -21,7 +21,7 @@ public class SoarProvider extends SoarProviderServer {
     private Object instance;
 
     /**
-     * @param redisHandler
+     * @param
      */
     public SoarProvider() {
 
